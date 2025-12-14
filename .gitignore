@@ -1,0 +1,8 @@
+# Ignore plugin downloads
+lazy-lock.json
+plugin/
+
+# Ignore undo history and swap files
+undo/
+swap/
+backup/
