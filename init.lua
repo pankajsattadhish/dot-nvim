@@ -1,0 +1,13 @@
+-- =============================================================================
+-- NEOVIM CONFIGURATION ENTRY POINT
+-- =============================================================================
+-- This is the main file that Neovim reads when it starts up.
+-- It's like the front door of your Neovim house.
+-- Everything else in your config is organized into folders and files.
+--
+-- The word "require" means "load and run" the code from another file.
+-- Here, we're loading the "core" module, which sets up the basic parts of Neovim.
+-- Core includes things like your key shortcuts, how the editor looks, and main plugins.
+--
+-- Think of it like: "Hey Neovim, go get the core stuff and set it up!"
+require("core")
