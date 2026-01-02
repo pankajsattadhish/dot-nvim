@@ -6,6 +6,29 @@ return {
       "mason-org/mason-lspconfig.nvim",
     },
     config = function()
+      local function get_capabilities()
+        local has_blink, blink = pcall(require, "blink.cmp")
+
+        if has_blink and blink.get_lsp_capabilities then
+          return vim.tbl_deep_extend(
+            "force",
+            vim.lsp.protocol.make_client_capabilities(),
+            blink.get_lsp_capabilities(),
+            {
+              workspace = {
+                fileOperations = {
+                  didRename = true,
+                  willRename = true,
+                },
+              },
+            }
+          )
+        else
+          return vim.lsp.protocol.make_client_capabilities()
+        end
+      end
+
+      local capabilities = get_capabilities()
       -- ════════════════════════════════════════════════════════════════════
       -- LSP Keymaps Setup
       -- ════════════════════════════════════════════════════════════════════
@@ -132,7 +155,7 @@ return {
       local lspconfig = require("lspconfig")
 
       local function default_setup(server_name)
-        lspconfig[server_name].setup({})
+        lspconfig[server_name].setup({ capabilities = capabilities})
       end
 
       local handlers = {
@@ -140,6 +163,7 @@ return {
 
         ["lua_ls"] = function()
           lspconfig.lua_ls.setup({
+            capabilities = capabilities,
             settings = {
               Lua = {
                 diagnostics = {
@@ -154,21 +178,6 @@ return {
                 telemetry = { enable = false },
               },
             },
-          })
-        end,
-
-        ["intelephense"] = function()
-          local get_license = function()
-            local f = assert(io.open(os.getenv("HOME") .. "/intelephense/license.txt", "rb"))
-            local content = f:read("*a")
-            f:close()
-            return string.gsub(content, "%s+", "")
-          end
-          lspconfig.intelephense.setup({
-            cmd = { "intelephense", "--stdio" },
-            filetypes = { "php", "blade" },
-            root_dir = lspconfig.util.root_pattern("composer.json", ".git"),
-            init_options = { licenceKey = get_license() },
           })
         end,
       }
@@ -189,7 +198,6 @@ return {
           "zls",
           "ts_ls",
           "rust-analyzer",
-          "intelephense",
           "bashls",
           "pyright",
           "cssls",

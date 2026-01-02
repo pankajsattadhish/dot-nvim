@@ -40,8 +40,6 @@ return {
         "terraform", -- Infrastructure as code.
         "proto",     -- Protocol buffers.
         "zig",       -- Zig language.
-        "php",       -- PHP web language.
-        "blade",     -- Laravel templates.
       },
     })
 

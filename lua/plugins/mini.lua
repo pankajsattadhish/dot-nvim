@@ -18,15 +18,15 @@ return {
       require("mini.pairs").setup()
 
       -- Statusline is now handled by lualine, so disable mini.statusline
-      local statusline = require("mini.statusline")
-      statusline.setup({
-        use_icons = vim.g.have_nerd_font,
-        set_vim_settings = false,
-      })
-      ---@diagnostic disable-next-line: duplicate-set-field
-      statusline.section_location = function()
-        return "%2l:%-2v"
-      end
+      -- local statusline = require("mini.statusline")
+      -- statusline.setup({
+      --   use_icons = vim.g.have_nerd_font,
+      --   set_vim_settings = false,
+      -- })
+      -- ---@diagnostic disable-next-line: duplicate-set-field
+      -- statusline.section_location = function()
+      --   return "%2l:%-2v"
+      -- end
     end,
   },
   {
