@@ -16,6 +16,7 @@ return {
       mode = { "n", "v" },
       desc = "Format",
     },
+    { "<leader>cM", "<cmd>GoModernize<cr>", desc = "Code: Go Modernize" },
   },
   opts = {
     formatters_by_ft = {

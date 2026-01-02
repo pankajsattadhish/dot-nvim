@@ -8,27 +8,7 @@
 -- It's useful for programmers who want to check their code quickly.
 
 return {
-  -- =============================================================================
-  -- NEOTEST-JAVA PLUGIN
-  -- =============================================================================
-  -- This is a special part for Java programming language.
-  -- Java is a language used for big programs like apps on phones or computers.
-  -- This plugin helps Neotest understand Java tests.
-  -- It only loads when you're editing Java files (ft = "java" means filetype Java).
-  {
-    "rcasia/neotest-java", -- The name of the plugin, like its address on the internet.
-    ft = "java", -- Only use this plugin for Java files. Saves memory!
-    dependencies = { -- These are other plugins that neotest-java needs to work.
-      "mfussenegger/nvim-jdtls", -- Helps with Java language features in Neovim.
-      "mfussenegger/nvim-dap", -- For debugging, which means finding and fixing mistakes in code.
-      "rcarriga/nvim-dap-ui", -- Makes the debugger look nice with buttons and windows.
-      "theHamsta/nvim-dap-virtual-text", -- Shows debug info right in your code.
-    },
-  },
-
-  -- =============================================================================
   -- MAIN NEOTEST PLUGIN
-  -- =============================================================================
   -- This is the main Neotest plugin that does all the test running.
   -- It uses "adapters" like tools to talk to different test systems.
   {
@@ -132,12 +112,6 @@ return {
           -- For Rust, a language for fast and safe programs.
           require("neotest-rust"),
 
-          -- For Java, with some extra settings inside the parentheses.
-          require("neotest-java")({
-            -- Config here means you can add special settings for Java tests.
-            -- For example, you might tell it where Java libraries are.
-            -- Right now it's empty, but you can add things later.
-          }),
         },
       })
     end,

@@ -1,3 +1,4 @@
+-- all completion/snippet logic.
 return {
   {
     "saghen/blink.cmp",
@@ -84,5 +85,6 @@ return {
       },
     },
   },
+  -- luasinp
+  { "L3MON4D3/LuaSnip", keys = {} },
 }
-

@@ -1,4 +1,3 @@
--- Linting: nvim-lint configuration
 return {
   "mfussenegger/nvim-lint",
   event = { "BufReadPre", "BufNewFile" },
@@ -6,9 +5,7 @@ return {
     local lint = require("lint")
     local lint_progress = {}
 
-    -- ══════════════════════════════════════════════════════════════════════════
     -- Custom Linter Configurations
-    -- ══════════════════════════════════════════════════════════════════════════
 
     -- Customize golangci-lint
     local golangcilint = lint.linters.golangcilint
@@ -47,9 +44,7 @@ return {
       }
     end
 
-    -- ══════════════════════════════════════════════════════════════════════════
     -- Linters by Filetype
-    -- ══════════════════════════════════════════════════════════════════════════
     lint.linters_by_ft = {
       go = { "golangcilint" },
       javascript = { "eslint_d" },
@@ -86,9 +81,7 @@ return {
       cpp = { "cppcheck", "cpplint" },
     }
 
-    -- ══════════════════════════════════════════════════════════════════════════
     -- Performance Optimizations
-    -- ══════════════════════════════════════════════════════════════════════════
 
     local debounce_timer = nil
     local function debounce_lint(ms)
@@ -122,9 +115,7 @@ return {
       return linters and #linters > 0
     end
 
-    -- ══════════════════════════════════════════════════════════════════════════
     -- Auto-lint Configuration
-    -- ══════════════════════════════════════════════════════════════════════════
     local lint_augroup = vim.api.nvim_create_augroup("nvim_lint", { clear = true })
 
     vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost" }, {
@@ -149,9 +140,7 @@ return {
       end,
     })
 
-    -- ══════════════════════════════════════════════════════════════════════════
     -- Commands and Keybindings
-    -- ══════════════════════════════════════════════════════════════════════════
 
     vim.api.nvim_create_user_command("LintInfo", function()
       local ft = vim.bo.filetype

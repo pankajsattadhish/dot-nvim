@@ -1,3 +1,4 @@
+-- all LSP/Tooling core setup.
 return {
   {
     "neovim/nvim-lspconfig",
@@ -29,9 +30,8 @@ return {
       end
 
       local capabilities = get_capabilities()
-      -- ════════════════════════════════════════════════════════════════════
+
       -- LSP Keymaps Setup
-      -- ════════════════════════════════════════════════════════════════════
       local function setup_keymaps(bufnr)
         local function map(mode, lhs, rhs, desc)
           vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc, silent = true })
@@ -79,9 +79,8 @@ return {
         end, "Toggle Inlay Hints")
       end
 
-      -- ════════════════════════════════════════════════════════════════════
       -- LSP Attach Handler
-      -- ════════════════════════════════════════════════════════════════════
+
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true }),
         callback = function(args)
@@ -93,8 +92,6 @@ return {
 
           setup_keymaps(bufnr)
           vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
-
-          -- Inlay hints disabled by default (toggle with <leader>lh)
 
           -- Document highlight on cursor hold
           if client.server_capabilities.documentHighlightProvider then
@@ -114,11 +111,9 @@ return {
         end,
       })
 
-      -- ════════════════════════════════════════════════════════════════════
       -- Diagnostic Configuration
-      -- ════════════════════════════════════════════════════════════════════
       vim.diagnostic.config({
-        virtual_text = true,
+        virtual_text = false,
         underline = true,
         update_in_insert = false,
         severity_sort = true,
@@ -134,95 +129,6 @@ return {
             [vim.diagnostic.severity.ERROR] = "ErrorMsg",
             [vim.diagnostic.severity.WARN] = "WarningMsg",
           },
-        },
-      })
-    end,
-  },
-  {
-    "mason-org/mason.nvim",
-    lazy = false,
-    cmd = "Mason",
-    config = function()
-      require("mason").setup()
-    end,
-  },
-  {
-    "mason-org/mason-lspconfig.nvim",
-    lazy = false,
-    dependencies = { "neovim/nvim-lspconfig" },
-    config = function()
-      local mason_lspconfig = require("mason-lspconfig")
-      local lspconfig = require("lspconfig")
-
-      local function default_setup(server_name)
-        lspconfig[server_name].setup({ capabilities = capabilities})
-      end
-
-      local handlers = {
-        default_setup,
-
-        ["lua_ls"] = function()
-          lspconfig.lua_ls.setup({
-            capabilities = capabilities,
-            settings = {
-              Lua = {
-                diagnostics = {
-                  globals = { "vim" },
-                  disable = { "inject-field", "undefined-field", "missing-fields" },
-                },
-                runtime = { version = "LuaJIT" },
-                workspace = {
-                  library = { vim.env.VIMRUNTIME },
-                  checkThirdParty = false,
-                },
-                telemetry = { enable = false },
-              },
-            },
-          })
-        end,
-      }
-
-      mason_lspconfig.setup({ handlers = handlers })
-    end,
-  },
-  {
-    "WhoIsSethDaniel/mason-tool-installer.nvim",
-    lazy = false,
-    dependencies = { "mason-org/mason-lspconfig.nvim" },
-    config = function()
-      require("mason-tool-installer").setup({
-        ensure_installed = {
-          -- Language Servers
-          "lua_ls",
-          "gopls",
-          "zls",
-          "ts_ls",
-          "rust-analyzer",
-          "bashls",
-          "pyright",
-          "cssls",
-          "html",
-          "jsonls",
-          "yamlls",
-          -- Linters
-          "eslint_d",
-          "luacheck",
-          "golangci-lint",
-          "shellcheck",
-          "markdownlint",
-          "yamllint",
-          "jsonlint",
-          "htmlhint",
-          "stylelint",
-          "ruff",
-          "mypy",
-          -- Formatters
-          "stylua",
-          "goimports",
-          "prettier",
-          "black",
-          "isort",
-          "shfmt",
         },
       })
     end,

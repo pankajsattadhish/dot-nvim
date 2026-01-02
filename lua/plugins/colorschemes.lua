@@ -1,4 +1,3 @@
--- Colorschemes: Theme configurations
 return {
   {
     "f-person/auto-dark-mode.nvim",
@@ -15,9 +14,7 @@ return {
     },
   },
 
-  -- ════════════════════════════════════════════════════════════════════════════
   -- Yukinord (default)
-  -- ════════════════════════════════════════════════════════════════════════════
   {
     "adibhanna/yukinord.nvim",
     -- dir = "~/Developer/opensource/yukinord/neovim",
@@ -30,9 +27,7 @@ return {
     end,
   },
 
-  -- ════════════════════════════════════════════════════════════════════════════
   -- Gruvbox Material
-  -- ════════════════════════════════════════════════════════════════════════════
   {
     "sainnhe/gruvbox-material",
     priority = 1000,

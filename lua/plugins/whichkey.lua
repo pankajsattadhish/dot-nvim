@@ -30,6 +30,9 @@ return {
       mode = { "n", "v" },
       -- Main groups (alphabetical)
       { "<leader>a", group = "AI" },
+      { "<leader>aa", function() require("opencode").ask("@this: ", { submit = true }) end, desc = "Ask" },
+      { "<leader>as", function() require("opencode").select() end, desc = "Select Action" },
+      { "<leader>at", function() require("opencode").toggle() end, desc = "Toggle" },
       { "<leader>b", group = "Buffers" },
       { "<leader>c", group = "Code" },
       { "<leader>d", group = "Diagnostics/Debug" },
