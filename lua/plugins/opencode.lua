@@ -31,7 +31,7 @@ return {
     vim.keymap.set("n", "<S-C-d>", function() require("opencode").command("session.half.page.down") end, { desc = "opencode half page down" }) -- Scroll down.
 
     -- Smart commit keybinding.
-    vim.keymap.set("n", "<leader>gc", function() require("opencode").command("/smart-commit") end, { desc = "Smart commit changes by feature" })
+    vim.keymap.set("n", "<leader>gc", function() require("opencode").ask("/smart-commit", { submit = true }) end, { desc = "Smart commit changes by feature" })
 
     -- Alternative keybindings if you use the opinionated Ctrl+A and Ctrl+X above.
     -- These restore the original increment/decrement functionality.
