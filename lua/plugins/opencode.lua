@@ -1,9 +1,3 @@
--- =============================================================================
--- OPENCODE: AI CODING ASSISTANT
--- =============================================================================
--- AI-powered coding assistant that can answer questions, suggest code,
--- and perform various coding tasks using AI models.
-
 return {
   -- OpenCode: AI coding assistant plugin.
   "NickvanDyke/opencode.nvim",
@@ -35,6 +29,9 @@ return {
     -- Scroll commands for AI chat (like page up/down).
     vim.keymap.set("n", "<S-C-u>", function() require("opencode").command("session.half.page.up") end, { desc = "opencode half page up" }) -- Scroll up.
     vim.keymap.set("n", "<S-C-d>", function() require("opencode").command("session.half.page.down") end, { desc = "opencode half page down" }) -- Scroll down.
+
+    -- Smart commit keybinding.
+    vim.keymap.set("n", "<leader>gc", function() require("opencode").command("/smart-commit") end, { desc = "Smart commit changes by feature" })
 
     -- Alternative keybindings if you use the opinionated Ctrl+A and Ctrl+X above.
     -- These restore the original increment/decrement functionality.
