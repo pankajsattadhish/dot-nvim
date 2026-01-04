@@ -1,29 +1,50 @@
+-- =============================================================================
+-- SNACKS: MULTI-PURPOSE UTILITY COLLECTION
+-- =============================================================================
+-- Snacks is a collection of small, useful Neovim plugins.
+-- Includes pickers, notifications, file explorer, and more.
+
 return {
+  -- Snacks: All-in-one utility plugin.
   "folke/snacks.nvim",
-  priority = 1000,
-  lazy = false,
-  ---@type snacks.Config
+  priority = 1000, -- Load early.
+  lazy = false, -- Load immediately.
+  ---@type snacks.Config -- Type hint for configuration.
   opts = {
+    -- Bigfile: Optimizes performance for large files.
     bigfile = { enabled = true },
+    -- Dashboard: Start screen (disabled, using alpha instead).
     dashboard = { enabled = false },
+    -- Explorer: File explorer (disabled, using nvim-tree).
     explorer = { enabled = false },
+    -- Indent: Shows indentation guides.
     indent = { enabled = true },
+    -- Input: Enhanced input dialogs.
     input = { enabled = true },
-    notifier = { enabled = true, timeout = 3000 },
+    -- Notifier: Notification system.
+    notifier = { enabled = true, timeout = 3000 }, -- Show notifications for 3 seconds.
+    -- Picker: Fuzzy finder and selector.
     picker = {
-      enabled = true,
+      enabled = true, -- Enable the picker system.
       sources = {
-        files = { hidden = true },
-        gh_issue = {},
-        gh_pr = {},
+        files = { hidden = true }, -- Include hidden files.
+        gh_issue = {}, -- GitHub issues.
+        gh_pr = {}, -- GitHub pull requests.
       },
     },
+    -- Quickfile: Quick file operations.
     quickfile = { enabled = true },
+    -- Scope: Highlights current scope.
     scope = { enabled = true },
+    -- Scroll: Smooth scrolling (disabled).
     scroll = { enabled = false },
+    -- Statuscolumn: Enhanced status column.
     statuscolumn = { enabled = true },
+    -- Words: Word highlighting and navigation.
     words = { enabled = true },
-    styles = { notification = {} },
+    -- Styles: UI styling options.
+    styles = { notification = {} }, -- Notification styling.
+    -- GitHub integration.
     gh = {},
   },
   keys = {
@@ -100,24 +121,6 @@ return {
       end,
       desc = "Notifications",
     },
-    {
-      "<leader>N",
-      function()
-        Snacks.win({
-          file = vim.api.nvim_get_runtime_file("doc/news.txt", false)[1],
-          width = 0.6,
-          height = 0.6,
-          wo = {
-            spell = false,
-            wrap = false,
-            signcolumn = "yes",
-            statuscolumn = " ",
-            conceallevel = 3,
-          },
-        })
-      end,
-      desc = "Neovim News",
-    },
     -- { "<c-/>", function() Snacks.terminal() end, desc = "Terminal" },
     {
       "<c-_>",
@@ -143,21 +146,21 @@ return {
       mode = { "n", "t" },
     },
 
-      -- <leader>b = Buffers
-{
-        "<leader>bb",
-        function()
-          Snacks.picker.buffers({
-            win = {
-              input = {
-                keys = { ["dd"] = "bufdelete", ["<c-d>"] = { "bufdelete", mode = { "n", "i" } } },
-              },
-              list = { keys = { ["dd"] = "bufdelete" } },
+    -- <leader>b = Buffers
+    {
+      "<leader>bb",
+      function()
+        Snacks.picker.buffers({
+          win = {
+            input = {
+              keys = { ["dd"] = "bufdelete", ["<c-d>"] = { "bufdelete", mode = { "n", "i" } } },
             },
-          })
-        end,
-        desc = "Switch Buffer",
-      },
+            list = { keys = { ["dd"] = "bufdelete" } },
+          },
+        })
+      end,
+      desc = "Switch Buffer",
+    },
     {
       "<leader>bd",
       function()

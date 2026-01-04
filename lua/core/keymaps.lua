@@ -4,8 +4,6 @@ vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move Lines Up" })
 
 -- When lines wrap (long lines show on multiple screen lines), move by screen lines.
 -- If you have a count (like 5k), move by real lines.
--- vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, desc = "Up (wrapped)" })
--- vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, desc = "Down (wrapped)" })
 
 -- BETTER INDENTING
 -- In visual mode, indent and keep selection.

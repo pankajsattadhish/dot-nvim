@@ -92,26 +92,12 @@ return {
       },
     },
 
-    -- =============================================================================
-    -- CONFIGURATION FUNCTION
-    -- =============================================================================
-    -- This is where we tell Neotest how to work.
-    -- It's like setting up the rules for the game.
     config = function()
-      -- Require means "get" the neotest module so we can use it.
       require("neotest").setup({
-        -- Adapters are like translators that help Neotest talk to different test systems.
-        -- Each language has its own way of running tests, so we need adapters for each.
         adapters = {
-          -- For JavaScript and TypeScript, using Vitest (a fast test runner).
-          require("neotest-vitest"),
-
-          -- For Python, which is another programming language.
-          require("neotest-python"),
-
-          -- For Rust, a language for fast and safe programs.
-          require("neotest-rust"),
-
+          require("neotest-vitest"), -- JavaScript/TypeScript testing
+          require("neotest-python"), -- Python testing
+          require("neotest-rust"), -- Rust testing
         },
       })
     end,

@@ -1,102 +1,76 @@
 return {
-  {
-    "f-person/auto-dark-mode.nvim",
-    opts = {
-      update_interval = 1000,
-      set_dark_mode = function()
-        require("kanagawa").setup({ style = "dark" })
-        vim.cmd([[colorscheme kanagawa]])
-      end,
-      set_light_mode = function()
-        require("kanagawa").setup({ style = "light" })
-        vim.cmd([[colorscheme kanagawa]])
-      end,
-    },
-  },
-
-  -- Yukinord (default)
-  {
-    "adibhanna/yukinord.nvim",
-    -- dir = "~/Developer/opensource/yukinord/neovim",
+ {
+    "vague-theme/vague.nvim",
+    lazy = false, -- make sure we load this during startup if it is your main colorscheme
+    priority = 1000, -- make sure to load this before all the other plugins
     config = function()
-      require("yukinord").setup({
-        transparent = true,
-        transparent_sidebar = true,
+      -- NOTE: you do not need to call setup if you don't want to.
+      require("vague").setup({
+        -- optional configuration here
       })
-      -- vim.cmd("colorscheme yukinord")
+      -- vim.cmd("colorscheme vague")
     end,
   },
 
-  -- Gruvbox Material
-  {
-    "sainnhe/gruvbox-material",
-    priority = 1000,
-    config = function()
-      -- vim.g.gruvbox_material_transparent_background = 1
-      vim.g.gruvbox_material_foreground = "mix"
-      vim.g.gruvbox_material_background = "hard"
-      vim.g.gruvbox_material_ui_contrast = "high"
-      vim.g.gruvbox_material_float_style = "bright"
-      vim.g.gruvbox_material_statusline_style = "mix"
-      vim.g.gruvbox_material_cursor = "auto"
-    end,
-  },
+  -- Kanagawa: Japanese-inspired colorscheme with multiple themes.
+  -- Dragon theme: dark, minimal, great for coding.
+  -- Includes custom overrides to fix popup colors for plugins.
   {
     "rebelot/kanagawa.nvim",
-    priority = 1000, -- Load this before everything else
-    lazy = false, -- We want the theme to load immediately
+    priority = 1000, -- Load before other plugins.
+    lazy = false, -- Load immediately, don't lazy-load.
     config = function()
       require("kanagawa").setup({
-        theme = "dragon", -- The dark, minimal flavor
-        background = { dark = "dragon" },
-        undercurl = true,
-        commentStyle = { italic = true },
-        keywordStyle = { italic = true },
+        theme = "dragon", -- Use the "dragon" theme (dark, minimal).
+        background = { dark = "dragon" }, -- Background style for dark mode.
+        undercurl = true, -- Enable undercurl for spelling errors, etc.
+        commentStyle = { italic = true }, -- Make comments italic.
+        keywordStyle = { italic = true }, -- Make keywords italic.
         colors = {
           theme = {
             all = {
               ui = {
-                bg_gutter = "none", -- Remove gutter background
+                bg_gutter = "none", -- Remove background from line number gutter.
               },
             },
           },
         },
-        -- THIS SECTION FIXES THE POPUPS (Your custom overrides)
+        -- Custom color overrides to fix plugin popups and UI elements.
+        -- These ensure plugins like Blink, Snacks, WhichKey look good with Kanagawa.
         overrides = function(colors)
-          local theme = colors.theme
+          local theme = colors.theme -- Access the theme's color palette.
           return {
-            -- 1. FIX BLINK (Autocomplete Popup)
-            BlinkCmpMenu = { fg = theme.ui.fg, bg = theme.ui.bg_m1 },
-            BlinkCmpMenuBorder = { fg = theme.ui.fg_border, bg = theme.ui.bg_m1 },
-            BlinkCmpDoc = { fg = theme.ui.fg, bg = theme.ui.bg_m1 },
-            BlinkCmpDocBorder = { fg = theme.ui.fg_border, bg = theme.ui.bg_m1 },
-            BlinkCmpMenuSelection = { fg = "NONE", bg = theme.ui.bg_p2, bold = true },
-            BlinkCmpLabelMatch = { fg = theme.syn.special1, bold = true },
+            -- 1. Fix Blink (autocomplete popup) colors.
+            BlinkCmpMenu = { fg = theme.ui.fg, bg = theme.ui.bg_m1 }, -- Menu text and bg.
+            BlinkCmpMenuBorder = { fg = theme.ui.fg_border, bg = theme.ui.bg_m1 }, -- Menu border.
+            BlinkCmpDoc = { fg = theme.ui.fg, bg = theme.ui.bg_m1 }, -- Documentation popup.
+            BlinkCmpDocBorder = { fg = theme.ui.fg_border, bg = theme.ui.bg_m1 }, -- Doc border.
+            BlinkCmpMenuSelection = { fg = "NONE", bg = theme.ui.bg_p2, bold = true }, -- Selected item.
+            BlinkCmpLabelMatch = { fg = theme.syn.special1, bold = true }, -- Matching text.
 
-            -- 2. FIX SNACKS (Search / Picker Window)
-            SnacksPickerNormal = { fg = theme.ui.fg, bg = theme.ui.bg_m1 },
-            SnacksPickerBorder = { fg = theme.ui.fg_border, bg = theme.ui.bg_m1 },
-            SnacksPickerTitle = { fg = theme.ui.special, bg = theme.ui.bg_m1, bold = true },
-            SnacksPickerInput = { fg = theme.ui.fg, bg = theme.ui.bg_p1 },
-            SnacksPickerList = { fg = theme.ui.fg, bg = theme.ui.bg_m1 },
+            -- 2. Fix Snacks (search/picker window) colors.
+            SnacksPickerNormal = { fg = theme.ui.fg, bg = theme.ui.bg_m1 }, -- Normal text.
+            SnacksPickerBorder = { fg = theme.ui.fg_border, bg = theme.ui.bg_m1 }, -- Border.
+            SnacksPickerTitle = { fg = theme.ui.special, bg = theme.ui.bg_m1, bold = true }, -- Title.
+            SnacksPickerInput = { fg = theme.ui.fg, bg = theme.ui.bg_p1 }, -- Input field.
+            SnacksPickerList = { fg = theme.ui.fg, bg = theme.ui.bg_m1 }, -- List items.
 
-            -- 3. FIX WHICH-KEY
-            WhichKeyFloat = { bg = theme.ui.bg_m1 },
-            WhichKeyBorder = { fg = theme.ui.fg_border, bg = theme.ui.bg_m1 },
+            -- 3. Fix WhichKey (key hint popup) colors.
+            WhichKeyFloat = { bg = theme.ui.bg_m1 }, -- Floating window bg.
+            WhichKeyBorder = { fg = theme.ui.fg_border, bg = theme.ui.bg_m1 }, -- Border.
 
-            -- 4. GENERAL FLOATING WINDOWS
-            NormalFloat = { bg = theme.ui.bg_m1 },
-            FloatBorder = { fg = theme.ui.fg_border, bg = theme.ui.bg_m1 },
+            -- 4. General floating windows (like LSP hover).
+            NormalFloat = { bg = theme.ui.bg_m1 }, -- Normal float bg.
+            FloatBorder = { fg = theme.ui.fg_border, bg = theme.ui.bg_m1 }, -- Float border.
 
-            -- 5. Scope Line
-            SnacksIndentScope = { fg = "#DCD7BA" },
+            -- 5. Indentation scope line color.
+            SnacksIndentScope = { fg = "#DCD7BA" }, -- Color for indent guides.
           }
         end,
       })
 
-      -- Force the colorscheme to load
+      -- Apply the colorscheme immediately.
       vim.cmd("colorscheme kanagawa")
     end,
   },
-  { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
 }

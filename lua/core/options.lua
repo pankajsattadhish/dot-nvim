@@ -1,38 +1,18 @@
--- =============================================================================
--- LEADER KEYS
--- =============================================================================
--- Leader keys are special keys you press before other keys to do shortcuts.
--- Think of it like a secret code to unlock commands.
--- The main leader is "space" (written as " "), and local leader is also "space".
--- So, when you see <leader> in keymaps, it means press space first.
+-- leader keys
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
--- =============================================================================
--- DISABLE BUILT-IN PLUGINS
--- =============================================================================
--- Neovim comes with some built-in plugins, but we don't need them.
--- Disabling them makes Neovim start faster and use less memory.
--- netrw is a file explorer, but we have better plugins for that.
-vim.g.loaded_netrw = 1  -- 1 means true, so disable it.
+-- disable built-in plugins
+vim.g.loaded_netrw = 1 -- 1 means true, so disable it.
 vim.g.loaded_netrwPlugin = 1
 
--- =============================================================================
--- DISABLE PROVIDERS
--- =============================================================================
--- Providers are ways Neovim can talk to other programming languages.
--- But we don't use Node.js, Perl, Python, or Ruby in our config.
--- Setting to 0 disables them, so Neovim doesn't complain in health checks.
+-- disable providers
 vim.g.loaded_node_provider = 0
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0
 
--- =============================================================================
--- EDITOR BEHAVIOR SETTINGS
--- =============================================================================
--- These settings control how Neovim acts when you type or move around.
--- It's like setting rules for how the editor behaves.
+-- editor behavior settings
 
 -- Allow mouse clicks in all modes (normal, insert, visual, etc.)
 vim.opt.mouse = "a"
@@ -46,10 +26,7 @@ vim.opt.undofile = true
 -- Where to save the undo files. stdpath("data") is Neovim's data folder.
 vim.opt.undodir = vim.fn.stdpath("data") .. "/undo"
 
--- =============================================================================
--- PERFORMANCE OPTIMIZATIONS
--- =============================================================================
--- These make Neovim faster and smoother.
+-- performance optimizations
 
 -- How often Neovim checks for things like file changes (in milliseconds).
 -- Lower means faster, but uses more CPU. 250ms is a good balance.
@@ -68,6 +45,7 @@ vim.opt.ttimeoutlen = 10
 
 -- Don't redraw the screen while running commands/macros.
 -- Makes things faster, but screen might look weird for a split second.
+-- Note: Keep false to avoid issues with Noice plugin.
 vim.opt.lazyredraw = false
 
 -- When resizing windows (splits), keep the content on screen stable.
@@ -79,18 +57,13 @@ vim.opt.grepprg = "rg --vimgrep"
 -- How to show search results: file:line:column:message
 vim.opt.grepformat = "%f:%l:%c:%m"
 
-
-
 -- Ask for confirmation before quitting with unsaved changes.
 vim.opt.confirm = true
 
 -- Automatically reload files if they change outside Neovim.
 vim.opt.autoread = true
 
--- =============================================================================
--- UI/DISPLAY SETTINGS
--- =============================================================================
--- These control how Neovim looks on your screen.
+-- ui/display settings
 
 -- Use true colors (millions of colors) instead of old 256 colors.
 vim.opt.termguicolors = true
@@ -111,7 +84,6 @@ vim.opt.numberwidth = 4
 -- Always show a column for signs (like error marks from LSP).
 vim.opt.signcolumn = "yes:1"
 
--- How to show the cursor line highlight (line under cursor).
 -- "screenline,number" means highlight the screen line and show numbers.
 vim.opt.cursorlineopt = "screenline,number"
 -- Highlight the line where the cursor is.
@@ -150,10 +122,7 @@ vim.opt.fillchars = { eob = " " }
 -- Make window borders rounded (looks nicer).
 vim.opt.winborder = "rounded"
 
--- =============================================================================
--- SEARCH SETTINGS
--- =============================================================================
--- How searching works in Neovim.
+-- search settings
 
 -- Highlight all matches of your search.
 vim.opt.hlsearch = true
@@ -168,12 +137,9 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
 -- Show live preview of substitute commands in a split window.
-vim.opt.inccommand = 'split'
+vim.opt.inccommand = "split"
 
--- =============================================================================
--- INDENTATION SETTINGS
--- =============================================================================
--- How tabs and spaces work for indenting code.
+-- indentation settings
 
 -- Use spaces instead of tabs when pressing Tab.
 vim.opt.expandtab = true
@@ -213,7 +179,7 @@ vim.opt.backupdir = vim.fn.stdpath("data") .. "/backup"
 vim.opt.writebackup = false
 
 -- Don't use swap files (they can cause issues).
-vim.opt.swapfile = true
+vim.opt.swapfile = false
 
 -- =============================================================================
 -- COMPLETION SETTINGS
@@ -243,15 +209,13 @@ vim.opt.guifont = "monospace:h17"
 -- New features only available in Neovim 0.10 or later.
 -- We check if the version is 0.10+ before enabling them.
 
-if vim.fn.has("nvim-0.10") == 1 then  -- If Neovim version is 0.10 or higher...
+if vim.fn.has("nvim-0.10") == 1 then -- If Neovim version is 0.10 or higher...
   -- Smooth scrolling when moving large distances (like Ctrl+D/U).
   vim.opt.smoothscroll = true
 
   -- How folded text looks (empty means use default).
   vim.opt.foldtext = ""
 end
-
-
 
 -- =============================================================================
 -- FILETYPE DETECTION
@@ -260,18 +224,18 @@ end
 -- File types help plugins know how to handle files (like syntax highlighting).
 
 vim.filetype.add({
-    -- By file extension (like .env for environment files).
-    extension = {
-        env = "dotenv",  -- .env files are dotenv type.
-    },
-    -- By exact filename.
-    filename = {
-        [".env"] = "dotenv",  -- File named .env.
-        ["env"] = "dotenv",   -- File named env.
-    },
-    -- By pattern in filename (using Lua patterns).
-    pattern = {
-        ["[jt]sconfig.*.json"] = "jsonc",  -- Files like tsconfig.json or jsconfig.json.
-        ["%.env%.[%w_.-]+"] = "dotenv",     -- Files like .env.local or .env.production.
-    },
+  -- By file extension (like .env for environment files).
+  extension = {
+    env = "dotenv", -- .env files are dotenv type.
+  },
+  -- By exact filename.
+  filename = {
+    [".env"] = "dotenv", -- File named .env.
+    ["env"] = "dotenv", -- File named env.
+  },
+  -- By pattern in filename (using Lua patterns).
+  pattern = {
+    ["[jt]sconfig.*.json"] = "jsonc", -- Files like tsconfig.json or jsconfig.json.
+    ["%.env%.[%w_.-]+"] = "dotenv", -- Files like .env.local or .env.production.
+  },
 })
