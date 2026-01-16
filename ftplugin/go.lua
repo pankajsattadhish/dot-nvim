@@ -1,8 +1,3 @@
--- =============================================================================
--- GO FILETYPE SETTINGS
--- =============================================================================
--- Settings and commands specific to Go programming language files.
-
 -- Use 4 spaces for tabs in Go (Go convention).
 vim.o.tabstop = 4
 

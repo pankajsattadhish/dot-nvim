@@ -1,12 +1,4 @@
--- =============================================================================
--- AUTOCOMPLETION AND SNIPPETS CONFIGURATION
--- =============================================================================
--- This file sets up code completion (autocomplete) and code snippets.
--- Completion suggests function names, variables, etc. as you type.
--- Snippets insert common code patterns with placeholders.
-
 return {
-  -- Blink.cmp: Fast, modern completion engine.
   -- Replaces nvim-cmp with better performance and features.
   {
     "saghen/blink.cmp",
@@ -45,7 +37,7 @@ return {
         },
         -- Keybindings for completion menu navigation.
         keymap = {
-          ["<C-space>"] = { "show", "show_documentation", "hide_documentation" }, -- Toggle completion/docs.
+          ["<C-space>"] = { "show", "hide", "show_documentation", "hide_documentation" }, -- Toggle completion/docs.
           ["<CR>"] = { "accept", "fallback" }, -- Accept completion or normal enter.
           ["<Tab>"] = { "select_next", "fallback" }, -- Next item or normal tab.
           ["<S-Tab>"] = { "select_prev", "fallback" }, -- Previous item or normal shift-tab.
@@ -59,7 +51,7 @@ return {
           enabled = true, -- Enable cmdline completion.
           completion = { menu = { auto_show = true } }, -- Show menu automatically.
           keymap = {
-            -- ["<CR>"] = { "accept", "fallback" }, -- Accept or normal enter.
+            ["<CR>"] = { "accept", "fallback" }, -- Accept or normal enter.
             -- ["<Tab>"] = { "select_next", "fallback" }, -- Next item or normal tab.
           },
         },

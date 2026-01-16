@@ -74,39 +74,6 @@ return {
       })
     end,
   },
-  -- Noice: Improved UI for messages, cmdline, and popups.
-  -- Replaces default Neovim UI with better looking, more functional versions.
-  {
-    "folke/noice.nvim",
-    event = "VeryLazy", -- Load late in startup.
-    enabled = true, -- Plugin is enabled.
-    opts = {}, -- Use default options.
-    dependencies = {
-      "MunifTanjim/nui.nvim", -- Required UI library.
-      -- "rcarriga/nvim-notify", -- Optional notification replacement.
-    },
-    config = function()
-      require("noice").setup({
-        lsp = { -- LSP-related UI improvements.
-          override = { -- Override default LSP functions with Noice versions.
-            ["vim.lsp.util.convert_input_to_markdown_lines"] = true, -- Better markdown rendering.
-            ["vim.lsp.util.stylize_markdown"] = true, -- Stylize markdown.
-            ["cmp.entry.get_documentation"] = true, -- Better completion docs.
-          },
-          hover = {
-            silent = true, -- Don't show messages when hovering.
-          },
-        },
-        presets = { -- Pre-configured UI improvements.
-          bottom_search = true, -- Classic bottom search cmdline.
-          command_palette = true, -- Command palette style for cmdline.
-          long_message_to_split = true, -- Long messages go to split window.
-          inc_rename = false, -- Disable incremental rename dialog.
-          lsp_doc_border = true, -- Add borders to LSP documentation.
-        },
-      })
-    end,
-  },
   -- Fidget: LSP progress indicator.
   -- Shows a spinner in corner when LSP is working (loading, indexing, etc.).
   {

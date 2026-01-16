@@ -1,9 +1,3 @@
--- =============================================================================
--- DEVELOPMENT TOOLS MANAGEMENT
--- =============================================================================
--- Mason manages installation of language servers, linters, and formatters.
--- Like a package manager for development tools.
-
 return {
   -- Mason: Package manager for LSP servers, linters, formatters, etc.
   -- Provides :Mason command to install/manage tools.
@@ -69,37 +63,38 @@ return {
     config = function()
       require("mason-tool-installer").setup({
         ensure_installed = { -- Auto-install these tools.
-          -- Language Servers (provide autocomplete, go-to-definition, etc.)
+        --   -- Language Servers (provide autocomplete, go-to-definition, etc.)
           "lua_ls", -- Lua
-          "gopls", -- Go
-          "zls", -- Zig
+        --   "gopls", -- Go
+        --   "zls", -- Zig
           "ts_ls", -- TypeScript/JavaScript
           "rust-analyzer", -- Rust
           "bashls", -- Bash
           "pyright", -- Python
           "cssls", -- CSS
           "html", -- HTML
-          "jsonls", -- JSON
-          "yamlls", -- YAML
-          -- Linters (check code quality and catch errors)
+        --   "jsonls", -- JSON
+        --   "yamlls", -- YAML
+          -- "jdtls", -- Java
+        --   -- Linters (check code quality and catch errors)
           "eslint_d", -- JavaScript/TypeScript
-          "luacheck", -- Lua
-          "golangci-lint", -- Go
-          "shellcheck", -- Shell scripts
-          "markdownlint", -- Markdown
-          "yamllint", -- YAML
-          "jsonlint", -- JSON
-          "htmlhint", -- HTML
-          "stylelint", -- CSS/SCSS
-          "ruff", -- Python (fast)
-          "mypy", -- Python type checking
-          -- Formatters (auto-format code)
-          "stylua", -- Lua
-          "goimports", -- Go (imports + format)
-          "prettier", -- Web languages
-          "black", -- Python
-          "isort", -- Python imports
-          "shfmt", -- Shell scripts
+        --   "luacheck", -- Lua
+        --   "golangci-lint", -- Go
+        --   "shellcheck", -- Shell scripts
+        --   "markdownlint", -- Markdown
+        --   "yamllint", -- YAML
+        --   "jsonlint", -- JSON
+        --   "htmlhint", -- HTML
+        --   "stylelint", -- CSS/SCSS
+        --   "ruff", -- Python (fast)
+        --   "mypy", -- Python type checking
+        --   -- Formatters (auto-format code)
+        --   "stylua", -- Lua
+        --   "goimports", -- Go (imports + format)
+        --   "prettier", -- Web languages
+        --   "black", -- Python
+        --   "isort", -- Python imports
+        --   "shfmt", -- Shell scripts
         },
       })
     end,

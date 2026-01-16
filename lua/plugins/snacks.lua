@@ -1,9 +1,3 @@
--- =============================================================================
--- SNACKS: MULTI-PURPOSE UTILITY COLLECTION
--- =============================================================================
--- Snacks is a collection of small, useful Neovim plugins.
--- Includes pickers, notifications, file explorer, and more.
-
 return {
   -- Snacks: All-in-one utility plugin.
   "folke/snacks.nvim",
@@ -48,9 +42,6 @@ return {
     gh = {},
   },
   keys = {
-    -- ════════════════════════════════════════════════════════════════════
-    -- Top-level (quick access)
-    -- ════════════════════════════════════════════════════════════════════
     {
       "<leader><space>",
       function()
@@ -100,13 +91,6 @@ return {
         Snacks.zen.zoom()
       end,
       desc = "Zoom",
-    },
-    {
-      "<leader>.",
-      function()
-        Snacks.scratch()
-      end,
-      desc = "Scratch Buffer",
     },
     {
       "<leader>n",
@@ -185,9 +169,6 @@ return {
       end,
       desc = "Rename File",
     },
-    -- cf (format) defined in conform.lua
-    -- ca (code action) defined in lsp.lua
-    -- cr (rename symbol) defined in lsp.lua
 
     -- <leader>d = Diagnostics / Debug
     {
@@ -226,7 +207,15 @@ return {
       function()
         Snacks.picker.grep()
       end,
-      desc = "Grep",
+      desc = "Grep live",
+    },
+
+    {
+      "<leader>ft",
+      function()
+        Snacks.picker.grep_word()
+      end,
+      desc = "Grep Word",
     },
     {
       "<leader>ff",
@@ -541,18 +530,6 @@ return {
       end,
       desc = "Dismiss Notifications",
     },
-    -- Other toggles defined in init function below
-
-    -- <leader>W = Windows
-    { "<leader>Wd", "<C-w>c", desc = "Close Window" },
-    { "<leader>Ws", "<C-w>s", desc = "Split Horizontal" },
-    { "<leader>Wv", "<C-w>v", desc = "Split Vertical" },
-    { "<leader>Wh", "<C-w>h", desc = "Go Left" },
-    { "<leader>Wj", "<C-w>j", desc = "Go Down" },
-    { "<leader>Wk", "<C-w>k", desc = "Go Up" },
-    { "<leader>Wl", "<C-w>l", desc = "Go Right" },
-    { "<leader>Ww", "<C-w>w", desc = "Other Window" },
-    { "<leader>W=", "<C-w>=", desc = "Equal Size" },
 
     -- g = Goto (LSP navigation via Snacks picker)
     {

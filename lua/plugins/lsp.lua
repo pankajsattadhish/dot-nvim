@@ -1,11 +1,4 @@
--- =============================================================================
--- LANGUAGE SERVER PROTOCOL (LSP) CONFIGURATION
--- =============================================================================
--- LSP provides smart code features: autocomplete, go-to-definition, errors, etc.
--- This file sets up LSP servers and their keybindings.
-
 return {
-  -- Nvim-LSPConfig: Main plugin for configuring LSP servers in Neovim.
   {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" }, -- Load when opening files.
@@ -52,7 +45,6 @@ return {
          map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, "Code Action") -- Show fixes/refactors.
          map("n", "<leader>cr", vim.lsp.buf.rename, "Rename Symbol") -- Rename variable/function.
          map("n", "<leader>cd", vim.diagnostic.open_float, "Line Diagnostic") -- Show error details.
-         -- <leader>cf (format) is handled by conform.lua plugin.
 
          -- <leader>l = LSP Management.
          map("n", "<leader>li", "<cmd>LspInfo<cr>", "LSP Info") -- Show LSP server status.

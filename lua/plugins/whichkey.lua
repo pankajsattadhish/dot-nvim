@@ -1,9 +1,3 @@
--- =============================================================================
--- WHICH KEY: KEYBINDING HINTS
--- =============================================================================
--- Shows popup with available keybindings when you press a leader key.
--- Helps you discover and remember keyboard shortcuts.
-
 return {
   -- WhichKey: Displays keybinding hints in a popup menu.
   "folke/which-key.nvim",
@@ -37,9 +31,9 @@ return {
       mode = { "n", "v" }, -- Apply to normal and visual modes.
       -- Main groups organized alphabetically by first letter.
       { "<leader>a", group = "AI" }, -- AI-related commands.
-      { "<leader>aa", function() require("opencode").ask("@this: ", { submit = true }) end, desc = "Ask" }, -- Ask AI about current file.
-      { "<leader>as", function() require("opencode").select() end, desc = "Select Action" }, -- Select AI action.
-      { "<leader>at", function() require("opencode").toggle() end, desc = "Toggle" }, -- Toggle AI features.
+      -- { "<leader>aa", function() require("opencode").ask("@this: ", { submit = true }) end, desc = "Ask" }, -- Ask AI about current file.
+      -- { "<leader>as", function() require("opencode").select() end, desc = "Select Action" }, -- Select AI action.
+      -- { "<leader>at", function() require("opencode").toggle() end, desc = "Toggle" }, -- Toggle AI features.
       { "<leader>b", group = "Buffers" }, -- Buffer management.
       { "<leader>c", group = "Code" }, -- Code actions (format, refactor).
       { "<leader>d", group = "Diagnostics/Debug" }, -- Error checking and debugging.
