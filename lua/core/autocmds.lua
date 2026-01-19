@@ -1,55 +1,38 @@
 local api = vim.api
 
--- disable auto-commenting new lines
+-- Disable auto-comment continuation
 api.nvim_create_autocmd("BufEnter", { command = [[set formatoptions-=cro]] })
 
--- soft word wrapping for mail files
-api.nvim_create_autocmd("Filetype", {
-  pattern = "mail",            -- Only for files with filetype "mail".
-  callback = function()
-    vim.opt.textwidth = 0      -- No automatic line breaking.
-    vim.opt.wrapmargin = 0     -- No margin for wrapping.
-    vim.opt.wrap = true        -- Wrap long lines.
-    vim.opt.linebreak = true   -- Break at word boundaries.
-    vim.opt.columns = 80       -- Window width 80 characters.
-    vim.opt.colorcolumn = "80" -- Show line at column 80.
-  end,
-})
-
--- highlight on yank
+-- Highlight on yank
 api.nvim_create_autocmd("TextYankPost", {
   callback = function()
     vim.hl.on_yank()
   end,
 })
 
--- remember cursor position
+-- Remember cursor position
 api.nvim_create_autocmd("BufReadPost", {
   callback = function()
-    local mark = vim.api.nvim_buf_get_mark(0, '"') -- Get the saved cursor position.
-    local lcount = vim.api.nvim_buf_line_count(0)  -- Total lines in file.
-    if mark[1] > 0 and mark[1] <= lcount then      -- If position is valid...
-      pcall(vim.api.nvim_win_set_cursor, 0, mark)  -- Go to that position.
+    local mark = vim.api.nvim_buf_get_mark(0, '"')
+    local lines = vim.api.nvim_buf_line_count(0)
+    if mark[1] > 0 and mark[1] <= lines then
+      pcall(vim.api.nvim_win_set_cursor, 0, mark)
     end
   end,
 })
 
--- cursor line only in active window
-local cursorGrp = api.nvim_create_augroup("CursorLine", { clear = true }) -- Group for these autocmds.
-api.nvim_create_autocmd(
-  { "InsertLeave", "WinEnter" },
-  {                             -- When leaving insert or entering window...
-    pattern = "*",              -- For all files.
-    command = "set cursorline", -- Turn on cursor line.
-    group = cursorGrp,          -- Put in the group.
-  }
-)
-api.nvim_create_autocmd(
-  { "InsertEnter", "WinLeave" },                                     -- When entering insert or leaving window...
-  { pattern = "*", command = "set nocursorline", group = cursorGrp } -- Turn off cursor line.
-)
+-- Cursorline only in active window
+local group = api.nvim_create_augroup("CursorLine", { clear = true })
+api.nvim_create_autocmd({ "InsertLeave", "WinEnter" }, {
+  command = "set cursorline",
+  group = group,
+})
+api.nvim_create_autocmd({ "InsertEnter", "WinLeave" }, {
+  command = "set nocursorline",
+  group = group,
+})
 
--- enable spell checking
+-- Spell checking for text/markdown/tex
 api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
   pattern = { "*.txt", "*.md", "*.tex" },
   callback = function()
@@ -58,10 +41,10 @@ api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
   end,
 })
 
--- close special buffers with q
+-- Close special buffers with q
 api.nvim_create_autocmd("FileType", {
-  group = api.nvim_create_augroup("close_with_q", { clear = true }), -- New group.
-  pattern = {                                                        -- List of filetypes that get the 'q' keymap.
+  group = api.nvim_create_augroup("close_with_q", { clear = true }),
+  pattern = {
     "PlenaryTestPopup",
     "help",
     "lspinfo",
@@ -76,37 +59,55 @@ api.nvim_create_autocmd("FileType", {
     "neotest-summary",
     "neotest-output-panel",
   },
-  callback = function(event)
-    vim.bo[event.buf].buflisted = false                                               -- Don't list this buffer.
-    vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = event.buf, silent = true }) -- Add 'q' to close.
+  callback = function(ev)
+    vim.bo[ev.buf].buflisted = false
+    vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = ev.buf, silent = true })
   end,
 })
 
--- resize splits on terminal resize
+-- Resize splits automatically
 api.nvim_create_autocmd("VimResized", {
   callback = function()
-    vim.cmd("wincmd =") -- Equalize window sizes.
+    vim.cmd("wincmd =")
   end,
 })
 
--- fix comment string for terraform/hcl
--- Terraform and HCL files use # for comments, not // or --.
--- This sets the correct comment format for those files.
+-- Fix commentstring for terraform/hcl
 api.nvim_create_autocmd("FileType", {
-  group = api.nvim_create_augroup("FixTerraformCommentString", { clear = true }), -- Group for this.
-  pattern = { "terraform", "hcl" },                                               -- For these file types.
+  group = api.nvim_create_augroup("FixTerraformCommentString", { clear = true }),
+  pattern = { "terraform", "hcl" },
   callback = function(ev)
-    vim.bo[ev.buf].commentstring = "# %s"                                         -- Use # for comments.
+    vim.bo[ev.buf].commentstring = "# %s"
   end,
 })
 
--- check for external file changes
--- When Neovim gets focus or you enter a buffer, check if the file changed outside.
--- Helps sync with other editors or tools.
-api.nvim_create_autocmd({ "FocusGained", "BufEnter" }, { -- On focus or buffer enter...
+-- External file change detection
+api.nvim_create_autocmd({ "FocusGained", "BufEnter" }, {
   callback = function()
-    if vim.fn.mode() ~= "c" then                         -- If not in command mode...
-      vim.cmd("checktime")                               -- Check for changes.
+    if vim.fn.mode() ~= "c" then
+      vim.cmd("checktime")
     end
+  end,
+})
+
+-- Soft word wrapping for mail files
+api.nvim_create_autocmd("Filetype", {
+  pattern = "mail",
+  callback = function()
+    vim.opt_local.wrap = true
+    vim.opt_local.linebreak = true
+    vim.opt_local.textwidth = 0
+    vim.opt_local.wrapmargin = 0
+    vim.opt_local.colorcolumn = "80"
+  end,
+})
+
+-- Auto-persist per project
+vim.api.nvim_create_autocmd("User", {
+  pattern = "PersistenceLoadPost",
+  callback = function()
+    pcall(function()
+      require("harpoon"):load()
+    end)
   end,
 })

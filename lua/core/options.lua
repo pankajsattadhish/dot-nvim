@@ -1,192 +1,164 @@
--- leader keys
+-- Leader keys
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
--- disable built-in plugins
--- vim.g.loaded_netrw = 1 -- 1 means true, so disable it.
--- vim.g.loaded_netrwPlugin = 1
-
--- disable providers
--- vim.g.loaded_node_provider = 0
--- vim.g.loaded_perl_provider = 0
--- vim.g.loaded_python3_provider = 0
--- vim.g.loaded_ruby_provider = 0
-
--- editor behavior settings
-
--- Allow mouse clicks in all modes (normal, insert, visual, etc.)
+-- Editor core settings
 vim.opt.mouse = "a"
-
--- Use the system clipboard, so copy/paste works with other programs.
 vim.opt.clipboard = "unnamedplus"
-
--- Save undo history even after closing the file.
--- So you can undo changes from last time you opened the file!
 vim.opt.undofile = true
--- Where to save the undo files. stdpath("data") is Neovim's data folder.
 vim.opt.undodir = vim.fn.stdpath("data") .. "/undo"
-
--- How often Neovim checks for things like file changes (in milliseconds).
--- Lower means faster, but uses more CPU. 250ms is a good balance.
-vim.opt.updatetime = 250
-
--- How long to wait for key combinations (like <leader> something).
--- 500ms is enough to type quickly but not too slow.
+vim.opt.updatetime = 500
 vim.opt.timeoutlen = 500
-
--- How long Neovim waits to redraw the screen for complex operations.
--- 10 seconds allows big files to load without giving up.
 vim.opt.redrawtime = 10000
-
--- Similar to timeoutlen, but for special key codes (faster response).
 vim.opt.ttimeoutlen = 10
-
--- Don't redraw the screen while running commands/macros.
--- Makes things faster, but screen might look weird for a split second.
 vim.opt.lazyredraw = true
-
--- When resizing windows (splits), keep the content on screen stable.
 vim.opt.splitkeep = "screen"
 
--- Use ripgrep (rg) for searching files. It's super fast!
-vim.opt.grepprg = "rg --vimgrep"
-
--- How to show search results: file:line:column:message
-vim.opt.grepformat = "%f:%l:%c:%m"
-
--- Ask for confirmation before quitting with unsaved changes.
-vim.opt.confirm = true
-
--- Automatically reload files if they change outside Neovim.
-vim.opt.autoread = true
-
--- ui/display settings
-
--- Use true colors (millions of colors) instead of old 256 colors.
-vim.opt.termguicolors = true
-
-vim.opt.number = true
-vim.opt.relativenumber = true
-vim.opt.scrolloff = 10
-
--- How wide the number column is (4 characters wide).
-vim.opt.numberwidth = 4
-
--- Always show a column for signs (like error marks from LSP).
-vim.opt.signcolumn = "yes:1"
-vim.opt.cursorlineopt = "screenline,number"
-vim.opt.cursorline = true
-vim.opt.colorcolumn = "80"
-
-vim.opt.wrap = true       -- Enable line wrapping
-vim.opt.linebreak = true  -- Wrap lines at convenient points
-vim.opt.list = false      -- Ensure 'list' is off
-vim.opt.showbreak = '↳ ' -- Shows this character at the start of wrapped lines
--- vim.opt.list = true
--- vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
-
--- When wrapping, keep the indent (spaces) the same.
-vim.opt.breakindent = true
-
-vim.opt.showmode = false
-vim.opt.showcmd = false
-
--- Show cursor position in the status line.
-vim.opt.ruler = true
-
--- Use a single statusline for all windows (global statusline).
-vim.opt.laststatus = 3
-
--- Don't show tab bar at the top (we use buffers instead).
-vim.opt.showtabline = 0
-
--- Height of the command line at the bottom (1 line).
-vim.opt.cmdheight = 1
-
--- Height of the popup menu (10 items max).
-vim.opt.pumheight = 10
-
--- What to show at end of buffer (empty space instead of ~).
-vim.opt.fillchars = { eob = " " }
-
-vim.opt.winborder = "rounded"
-
-vim.opt.hlsearch = true
-
--- Show matches as you type (incremental search).
-vim.opt.incsearch = true
-
+-- Search
 vim.opt.ignorecase = true
-
--- Show live preview of substitute commands in a split window.
+vim.opt.incsearch = true
+vim.opt.hlsearch = true
+vim.opt.grepprg = "rg --vimgrep"
+vim.opt.grepformat = "%f:%l:%c:%m"
 vim.opt.inccommand = "split"
 
--- Use spaces instead of tabs when pressing Tab.
-vim.opt.expandtab = true
+-- UI
+vim.opt.number = true
+vim.opt.relativenumber = true
+vim.opt.termguicolors = true
+vim.opt.signcolumn = "yes:1"
+vim.opt.cursorline = true
+vim.opt.cursorlineopt = "screenline,number"
+vim.opt.colorcolumn = "80"
+vim.opt.scrolloff = 10
+vim.opt.wrap = true
+vim.opt.linebreak = true
+vim.opt.breakindent = true
+vim.opt.showbreak = "↳ "
+vim.opt.fillchars = { eob = " " }
+vim.opt.pumheight = 10
+vim.opt.cmdheight = 1
+vim.opt.laststatus = 3
 
--- How many spaces for each indent level (2 spaces).
-vim.opt.shiftwidth = 2
+-- Lua function for diagnostics count
+_G._diag = function()
+  local sev = vim.diagnostic.severity
+  local function c(s)
+    return #vim.diagnostic.get(0, { severity = s })
+  end
 
--- Automatically indent new lines smartly.
-vim.opt.smartindent = true
+  local e = c(sev.ERROR)
+  local w = c(sev.WARN)
+  local i = c(sev.INFO)
+  local h = c(sev.HINT)
 
--- New horizontal splits open below current window.
-vim.opt.splitbelow = true
+  local t = {}
+  if e > 0 then
+    table.insert(t, " " .. e)
+  end
+  if w > 0 then
+    table.insert(t, " " .. w)
+  end
+  if i > 0 then
+    table.insert(t, " " .. i)
+  end
+  if h > 0 then
+    table.insert(t, " " .. h)
+  end
 
--- New vertical splits open to the right of current window.
-vim.opt.splitright = true
+  return table.concat(t, " ")
+end
 
--- Save files in UTF-8 encoding (supports all languages).
-vim.opt.fileencoding = "utf-8"
+_G._lsp = function()
+  local ft = vim.bo.filetype
+  for _, client in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do
+    if client.config.filetypes and vim.tbl_contains(client.config.filetypes, ft) then
+      return " " .. client.name
+    end
+  end
+  return ""
+end
 
--- Create backup files before saving.
-vim.opt.backup = true
+_G._git = function()
+  local d = vim.b.gitsigns_status_dict
+  if not d then
+    return ""
+  end
 
--- Where to put backup files.
-vim.opt.backupdir = vim.fn.stdpath("data") .. "/backup"
+  local added = d.added or 0
+  local changed = d.changed or 0
+  local removed = d.removed or 0
 
--- Don't keep backup while editing (faster).
--- vim.opt.writebackup = false
+  local t = {}
+  if added > 0 then
+    table.insert(t, " " .. added)
+  end
+  if changed > 0 then
+    table.insert(t, " " .. changed)
+  end
+  if removed > 0 then
+    table.insert(t, " " .. removed)
+  end
 
--- Don't use swap files (they can cause issues).
-vim.opt.swapfile = false
+  return table.concat(t, " ")
+end
 
--- How auto-completion works.
-
--- Options for completion menu: show menu, even with one item, don't select automatically.
-vim.opt.completeopt = { "menu", "menuone", "noselect" }
-
--- Don't hide text with conceal (like in markdown).
-vim.opt.conceallevel = 0
-
--- Show file name in window title.
+vim.o.statusline = table.concat({
+  " %f",
+  " %m",
+  " %r",
+  "  ",
+  " %{v:lua._diag()}",
+  "  ",
+  " %{v:lua._git()}",
+  "  ",
+  " %{v:lua._lsp()}",
+  " %=",
+  " Ln %l/%L",
+  " Col %c",
+  "  ",
+  "%P",
+})
 vim.opt.title = true
 
--- Font for GUI version (size 17).
+-- Window / split behavior
+vim.opt.splitbelow = true
+vim.opt.splitright = true
+
+-- File encoding
+vim.opt.fileencoding = "utf-8"
+
+-- Backup / swap
+vim.opt.backup = true
+vim.opt.backupdir = vim.fn.stdpath("data") .. "/backup"
+vim.opt.swapfile = false
+
+-- Completion
+vim.opt.completeopt = { "menu", "menuone", "noselect" }
+
+-- Tabs/Indent (universal defaults, overridden in ftplugin/)
+vim.opt.expandtab = true
+vim.opt.shiftwidth = 2
+vim.opt.tabstop = 2
+vim.opt.smartindent = true
+
+-- Folds
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+vim.opt.foldlevel = 99
+
+-- Titles / fonts
 vim.opt.guifont = "monospace:h17"
 
-  -- Smooth scrolling when moving large distances (like Ctrl+D/U).
-  vim.opt.smoothscroll = true
+-- Smooth scrolling
+vim.opt.smoothscroll = true
 
-  -- How folded text looks (empty means use default).
-  vim.opt.foldtext = ""
-
--- Tell Neovim how to recognize different file types.
--- File types help plugins know how to handle files (like syntax highlighting).
-
+-- Filetype rules
 vim.filetype.add({
-  -- By file extension (like .env for environment files).
-  extension = {
-    env = "dotenv", -- .env files are dotenv type.
-  },
-  -- By exact filename.
-  filename = {
-    [".env"] = "dotenv", -- File named .env.
-    ["env"] = "dotenv", -- File named env.
-  },
-  -- By pattern in filename (using Lua patterns).
+  extension = { env = "dotenv" },
+  filename = { [".env"] = "dotenv", ["env"] = "dotenv" },
   pattern = {
-    ["[jt]sconfig.*.json"] = "jsonc", -- Files like tsconfig.json or jsconfig.json.
-    ["%.env%.[%w_.-]+"] = "dotenv", -- Files like .env.local or .env.production.
+    ["[jt]sconfig.*.json"] = "jsonc",
+    ["%.env%.[%w_.-]+"] = "dotenv",
   },
 })
