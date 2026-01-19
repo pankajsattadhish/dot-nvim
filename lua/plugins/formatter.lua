@@ -1,9 +1,3 @@
--- =============================================================================
--- CODE FORMATTING
--- =============================================================================
--- Automatically formats code using various formatters.
--- Keeps code style consistent across projects.
-
 return {
   -- Conform: Universal code formatter.
   -- Supports many languages and formatters.

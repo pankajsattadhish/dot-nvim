@@ -1,100 +1,133 @@
 return {
-  -- Mason: Package manager for LSP servers, linters, formatters, etc.
-  -- Provides :Mason command to install/manage tools.
+  ------------------------------------------------------------
+  -- MASON (install LSP/formatters/linters)
+  ------------------------------------------------------------
   {
     "mason-org/mason.nvim",
-    lazy = false, -- Load immediately.
-    cmd = "Mason", -- Command to open Mason UI.
+    lazy = false,
+    cmd = "Mason",
     config = function()
-      require("mason").setup() -- Basic setup with defaults.
+      require("mason").setup()
     end,
   },
-  -- Mason-LSPConfig: Bridges Mason and LSPConfig.
-  -- Automatically configures LSP servers installed by Mason.
+
+  ------------------------------------------------------------
+  -- MASON + LSPCONFIG bridge
+  ------------------------------------------------------------
   {
     "mason-org/mason-lspconfig.nvim",
-    lazy = false, -- Load immediately.
-    dependencies = { "neovim/nvim-lspconfig" }, -- Requires LSPConfig.
+    lazy = false,
+    dependencies = { "neovim/nvim-lspconfig" },
     config = function()
-      local mason_lspconfig = require("mason-lspconfig") -- Mason LSP bridge.
-      local lspconfig = require("lspconfig") -- LSP configuration.
-      local capabilities = require("core.utils").get_lsp_capabilities() -- Enhanced capabilities.
+      local mason_lspconfig = require("mason-lspconfig")
+      local lspconfig = require("lspconfig")
+      local capabilities = require("core.utils").get_lsp_capabilities()
 
-      -- Default setup function for most LSP servers.
-      local function default_setup(server_name)
-        lspconfig[server_name].setup({ capabilities = capabilities }) -- Basic setup.
+      -- Basic default handler
+      local function default(server)
+        lspconfig[server].setup({ capabilities = capabilities })
       end
 
-      -- Handlers for specific LSP servers that need custom config.
-      local handlers = {
-        default_setup, -- Use default for most servers.
+      mason_lspconfig.setup({
+        handlers = {
+          default,
 
-        -- Custom setup for Lua language server.
-        ["lua_ls"] = function()
-          lspconfig.lua_ls.setup({
-            capabilities = capabilities, -- Enhanced completion features.
-            settings = {
-              Lua = {
-                diagnostics = {
-                  globals = { "vim" }, -- Recognize 'vim' global.
-                  disable = { "inject-field", "undefined-field", "missing-fields" }, -- Reduce noise.
-                },
-                runtime = { version = "LuaJIT" }, -- Neovim uses LuaJIT.
-                workspace = {
-                  library = { vim.env.VIMRUNTIME }, -- Include Neovim runtime.
-                  checkThirdParty = false, -- Skip third-party checks.
-                },
-                telemetry = { enable = false }, -- Disable telemetry.
+          ------------------------------------------------------------
+          -- JavaScript / TypeScript / React
+          ------------------------------------------------------------
+          ["ts_ls"] = function()
+            lspconfig.ts_ls.setup({
+              capabilities = capabilities,
+              settings = {
+                typescript = { inlayHints = { includeInlayParameterNameHints = "all" } },
+                javascript = { inlayHints = { includeInlayParameterNameHints = "all" } },
               },
-            },
-          })
-        end,
-      }
+            })
+          end,
 
-      mason_lspconfig.setup({ handlers = handlers }) -- Apply configurations.
+          ------------------------------------------------------------
+          -- Python
+          ------------------------------------------------------------
+          ["pyright"] = function()
+            lspconfig.pyright.setup({
+              capabilities = capabilities,
+              settings = {
+                python = {
+                  analysis = {
+                    typeCheckingMode = "basic",
+                    autoSearchPaths = true,
+                    useLibraryCodeForTypes = true,
+                  },
+                },
+              },
+            })
+          end,
+
+          ------------------------------------------------------------
+          -- C/C++
+          ------------------------------------------------------------
+          ["clangd"] = function()
+            lspconfig.clangd.setup({
+              capabilities = capabilities,
+              cmd = {
+                "clangd",
+                "--background-index",
+                "--clang-tidy",
+                "--header-insertion=iwyu",
+              },
+            })
+          end,
+
+          ------------------------------------------------------------
+          -- HTML / CSS
+          ------------------------------------------------------------
+          ["html"] = default,
+          ["cssls"] = default,
+
+          ------------------------------------------------------------
+          -- Java (using nvim-java plugin separately)
+          ------------------------------------------------------------
+          -- jdtls is NOT installed via mason
+          -- nvim-java manages its own JDTLS installation
+        },
+      })
     end,
   },
-  -- Mason Tool Installer: Auto-installs tools listed below.
-  -- Ensures all development tools are available without manual installation.
+
+  ------------------------------------------------------------
+  -- Mason-Tool-Installer (install only needed tools)
+  ------------------------------------------------------------
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
-    lazy = false, -- Load immediately to install tools.
-    dependencies = { "mason-org/mason-lspconfig.nvim" }, -- Requires Mason.
+    lazy = false,
     config = function()
       require("mason-tool-installer").setup({
-        ensure_installed = { -- Auto-install these tools.
-        --   -- Language Servers (provide autocomplete, go-to-definition, etc.)
-          "lua_ls", -- Lua
-        --   "gopls", -- Go
-        --   "zls", -- Zig
-          "ts_ls", -- TypeScript/JavaScript
-          "rust-analyzer", -- Rust
-          "bashls", -- Bash
-          "pyright", -- Python
-          "cssls", -- CSS
-          "html", -- HTML
-        --   "jsonls", -- JSON
-        --   "yamlls", -- YAML
-          -- "jdtls", -- Java
-        --   -- Linters (check code quality and catch errors)
-          "eslint_d", -- JavaScript/TypeScript
-        --   "luacheck", -- Lua
-        --   "golangci-lint", -- Go
-        --   "shellcheck", -- Shell scripts
-        --   "markdownlint", -- Markdown
-        --   "yamllint", -- YAML
-        --   "jsonlint", -- JSON
-        --   "htmlhint", -- HTML
-        --   "stylelint", -- CSS/SCSS
-        --   "ruff", -- Python (fast)
-        --   "mypy", -- Python type checking
-        --   -- Formatters (auto-format code)
-        --   "stylua", -- Lua
-        --   "goimports", -- Go (imports + format)
-        --   "prettier", -- Web languages
-        --   "black", -- Python
-        --   "isort", -- Python imports
-        --   "shfmt", -- Shell scripts
+        ensure_installed = {
+          ------------------------------------------------------------
+          -- LSP servers
+          ------------------------------------------------------------
+          "ts_ls",
+          "pyright",
+          "clangd",
+          "html",
+          "cssls",
+
+          ------------------------------------------------------------
+          -- Linters
+          ------------------------------------------------------------
+          "eslint_d", -- JS/TS/React
+          "ruff", -- Python linter (also can format)
+          "htmlhint", -- HTML
+          "stylelint", -- CSS
+          "luacheck", -- for your config
+
+          ------------------------------------------------------------
+          -- Formatters
+          ------------------------------------------------------------
+          "prettier", -- JS/TS/HTML/CSS
+          "black", -- Python
+          "clang-format", -- C++
+          "stylua", -- Lua (config)
         },
       })
     end,

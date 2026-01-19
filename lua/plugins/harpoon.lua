@@ -1,9 +1,15 @@
 return {
   "ThePrimeagen/harpoon",
-  lazy = true,
-  dependencies = {
-    "nvim-lua/plenary.nvim",
+  branch = "harpoon2",
+  dependencies = { "nvim-lua/plenary.nvim" },
+
+  opts = {
+    settings = {
+      save_on_toggle = true,
+      sync_on_ui_close = true,
+    },
   },
+
   keys = {
     {
       "<leader>ha",
@@ -34,31 +40,32 @@ return {
       desc = "Previous Mark",
     },
     {
-      "<C-h>",
+      "<leader>h1",
       function()
         require("harpoon.ui").nav_file(1)
       end,
       desc = "Mark 1",
     },
     {
-      "<C-i>",
+      "<leader>h2",
       function()
         require("harpoon.ui").nav_file(2)
       end,
       desc = "Mark 2",
     },
     {
-      "<C-p>",
+      "<leader>h3",
       function()
         require("harpoon.ui").nav_file(3)
       end,
       desc = "Mark 3",
     },
     {
-      "<C-n>",
+      "<leader>h4",
       function()
         require("harpoon.ui").nav_file(4)
       end,
       desc = "Mark 4",
     },
-  }}
+  },
+}

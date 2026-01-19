@@ -1,15 +1,12 @@
 return {
   "nvim-treesitter/nvim-treesitter",
-  -- FORCE the stable branch to fix the "module not found" error
   branch = "master",
   build = ":TSUpdate",
-  lazy = false,
+  event = "BufReadPre",
   dependencies = {
-    -- Also force the textobjects plugin to stay on its compatible branch
     { "nvim-treesitter/nvim-treesitter-textobjects", branch = "master" },
   },
   config = function()
-    -- Use the old module name that 'master' branch expects
     require("nvim-treesitter.configs").setup({
       modules = {},
       ignore_install = {},
@@ -20,27 +17,14 @@ return {
         "javascript",
         "json",
         "lua",
-        "luadoc",
-        "luap",
         "markdown",
         "markdown_inline",
         "python",
-        "query",
-        "regex",
-        "tsx",
+        "rust",
         "typescript",
-        "vue",
         "vim",
         "vimdoc",
         "yaml",
-        "rust",
-        "go",
-        "gomod",
-        "gowork",
-        "gosum",
-        "terraform",
-        "proto",
-        "zig",
       },
       sync_install = false,
       auto_install = true,
