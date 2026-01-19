@@ -43,20 +43,6 @@ return {
   },
   keys = {
     {
-      "<leader><space>",
-      function()
-        Snacks.picker.smart()
-      end,
-      desc = "Smart Find",
-    },
-    {
-      "<leader>:",
-      function()
-        Snacks.picker.command_history()
-      end,
-      desc = "Command History",
-    },
-    {
       "<leader>o",
       function()
         Snacks.picker.buffers({
@@ -318,34 +304,7 @@ return {
       desc = "Browse (GitHub)",
       mode = { "n", "v" },
     },
-    {
-      "<leader>gi",
-      function()
-        Snacks.picker.gh_issue()
-      end,
-      desc = "Issues",
-    },
-    {
-      "<leader>gI",
-      function()
-        Snacks.picker.gh_issue({ state = "all" })
-      end,
-      desc = "Issues (all)",
-    },
-    {
-      "<leader>gp",
-      function()
-        Snacks.picker.gh_pr()
-      end,
-      desc = "Pull Requests",
-    },
-    {
-      "<leader>gP",
-      function()
-        Snacks.picker.gh_pr({ state = "all" })
-      end,
-      desc = "Pull Requests (all)",
-    },
+
     -- Hunk operations defined in git.lua
 
     -- <leader>l = LSP
