@@ -1,74 +1,53 @@
 return {
-  -- Gitsigns shows Git changes in the sign column (left side).
+  -- Gitsigns: gutter signs, hunks, blame, staging
   {
-    "lewis6991/gitsigns.nvim", -- The Gitsigns plugin.
-    lazy = true, -- Load only when needed.
-    event = { "BufReadPre", "BufNewFile" }, -- Load when opening files.
-    config = function()
-      -- Set up Gitsigns with custom signs and options.
-      require("gitsigns").setup({
-        -- =============================================================================
-        -- SIGNS FOR CHANGES
-        -- =============================================================================
-        -- Symbols to show in the sign column for different Git changes.
-        signs = {
-          add = { text = "┃" }, -- Added lines.
-          change = { text = "┃" }, -- Changed lines.
-          delete = { text = "_" }, -- Deleted lines.
-          topdelete = { text = "‾" }, -- Top of deleted block.
-          changedelete = { text = "~" }, -- Changed and deleted.
-          untracked = { text = "┆" }, -- New files not in Git.
-        },
-        -- =============================================================================
-        -- SIGNS FOR STAGED CHANGES
-        -- =============================================================================
-        -- Symbols for changes that are ready to commit.
-        signs_staged = {
-          add = { text = "┃" },
-          change = { text = "┃" },
-          delete = { text = "_" },
-          topdelete = { text = "‾" },
-          changedelete = { text = "~" },
-          untracked = { text = "┆" },
-        },
-        signcolumn = true,
-        numhl = false,
-        linehl = false,
-        word_diff = false,
-        watch_gitdir = { interval = 1000, follow_files = true },
-        attach_to_untracked = true,
-        current_line_blame = false,
-        current_line_blame_opts = {
-          virt_text = true,
-          virt_text_pos = "eol",
-          delay = 1000,
-          ignore_whitespace = false,
-        },
-        current_line_blame_formatter = "<author>, <author_time:%Y-%m-%d> - <summary>",
-        sign_priority = 6,
-        status_formatter = nil,
-        update_debounce = 200,
-        max_file_length = 40000,
-        preview_config = {
-          border = "rounded",
-          style = "minimal",
-          relative = "cursor",
-          row = 0,
-          col = 1,
-        },
-        on_attach = function(bufnr)
-          local gs = require("gitsigns")
-          local map = function(mode, lhs, rhs, desc)
-            vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
-          end
-          -- Navigation
-          map("n", "]h", gs.next_hunk, "Next Hunk")
-          map("n", "[h", gs.prev_hunk, "Prev Hunk")
-        end,
-      })
-    end,
+    "lewis6991/gitsigns.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    opts = {
+      signs = {
+        add = { text = "┃" },
+        change = { text = "┃" },
+        delete = { text = "_" },
+        topdelete = { text = "‾" },
+        changedelete = { text = "~" },
+        untracked = { text = "┆" },
+      },
+      signs_staged = {
+        add = { text = "┃" },
+        change = { text = "┃" },
+        delete = { text = "_" },
+        topdelete = { text = "‾" },
+        changedelete = { text = "~" },
+        untracked = { text = "┆" },
+      },
+      signcolumn = true,
+      current_line_blame = false,
+      current_line_blame_opts = {
+        virt_text = true,
+        virt_text_pos = "eol",
+        delay = 1000,
+        ignore_whitespace = false,
+      },
+      preview_config = {
+        border = "rounded",
+        style = "minimal",
+        relative = "cursor",
+        row = 0,
+        col = 1,
+      },
+      on_attach = function(bufnr)
+        local gs = require("gitsigns")
+
+        local map = function(mode, lhs, rhs, desc)
+          vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
+        end
+
+        -- Hunk Navigation
+        map("n", "]h", gs.next_hunk, "Next Hunk")
+        map("n", "[h", gs.prev_hunk, "Prev Hunk")
+      end,
+    },
     keys = {
-      -- All under <leader>g for Git
       {
         "<leader>gh",
         function()
@@ -95,7 +74,7 @@ return {
         function()
           require("gitsigns").undo_stage_hunk()
         end,
-        desc = "Undo Stage",
+        desc = "Undo Stage Hunk",
       },
       {
         "<leader>gr",
@@ -118,24 +97,28 @@ return {
         end,
         desc = "Blame Line",
       },
-      {
-        "<leader>gD",
-        function()
-          vim.cmd("Gitsigns diffthis HEAD")
-        end,
-        desc = "Diff HEAD",
-      },
+      { "<leader>gD", "<cmd>Gitsigns diffthis HEAD<CR>", desc = "Diff with HEAD" },
     },
   },
+
+  -- Diffview: full diff UI, history browsing
   {
     "sindrets/diffview.nvim",
     event = "VeryLazy",
-    cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles" },
+    cmd = {
+      "DiffviewOpen",
+      "DiffviewClose",
+      "DiffviewToggleFiles",
+      "DiffviewFocusFiles",
+      "DiffviewFileHistory",
+    },
+    keys = {
+      { "<leader>gd", "<cmd>DiffviewOpen<CR>", desc = "Diffview Open" },
+      { "<leader>gh", "<cmd>DiffviewFileHistory<CR>", desc = "File History" },
+    },
   },
-  -- Git related plugins
-  "tpope/vim-fugitive",
-  "tpope/vim-rhubarb",
-  -- Undo tree
+
+  -- Undotree: separate undo history tree (Primeagen approved)
   {
     "mbbill/undotree",
     keys = {
