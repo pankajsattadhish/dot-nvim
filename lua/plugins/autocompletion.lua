@@ -21,7 +21,7 @@ return {
         -- Completion sources: where suggestions come from.
         sources = {
           -- Default sources to use for completion.
-          default = { "lazydev", "lsp", "path", "buffer", "snippets" },
+          default = { "lsp", "path", "buffer", "snippets" },
           providers = {
             -- LazyDev: completions for Neovim Lua development.
             lazydev = {
@@ -51,7 +51,7 @@ return {
           enabled = true, -- Enable cmdline completion.
           completion = { menu = { auto_show = true } }, -- Show menu automatically.
           keymap = {
-            ["<CR>"] = { "accept", "fallback" }, -- Accept or normal enter.
+            -- ["<CR>"] = { "accept", "fallback" }, -- Accept or normal enter.
             -- ["<Tab>"] = { "select_next", "fallback" }, -- Next item or normal tab.
           },
         },
