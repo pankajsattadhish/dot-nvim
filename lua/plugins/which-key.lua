@@ -43,8 +43,7 @@ return {
 			{ "<leader>g", group = "Git"},
 			{ "<leader>l", group = "LSP" },
 			{ "<leader>p", group = "Pick/Find" },
-			{ "<leader>s", group = "Search" },
-			{ "<leader>u", group = "UI" },
+			{ "<leader>t", group = "Toggle" },
 
 			-- Navigation
 			{ "[", group = "Prev" },

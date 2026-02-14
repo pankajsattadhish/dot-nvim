@@ -4,7 +4,7 @@ return {
 	lazy = true,
 	ft = "markdown",
 	dependencies = {
-		"folke/snacks.nvim",
+		"nvim-telescope/telescope.nvim",
 		"nvim-lua/plenary.nvim",
 		"saghen/blink.cmp",
 	},
@@ -42,7 +42,6 @@ return {
 
 		ui = {
 			enable = true,
-			picker = "snacks",
 		},
 
 		follow_url_func = function(url)
@@ -55,6 +54,7 @@ return {
 		{ "<leader>oo", "<cmd>ObsidianQuickSwitch<cr>", desc = "Quick switch" },
 		{ "<leader>od", "<cmd>ObsidianToday<cr>", desc = "Today note" },
 		{ "<leader>ot", "<cmd>ObsidianTemplate<cr>", desc = "Insert template" },
+		{ "<leader>ow", "<cmd>ObsidianWorkspace<cr>", desc = "Wokspaces" },
 		{ "gf", "<cmd>ObsidianFollowLink<cr>", desc = "Follow link" },
 	},
 }
