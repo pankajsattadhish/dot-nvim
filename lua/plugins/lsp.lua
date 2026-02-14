@@ -1,16 +1,13 @@
 return {
-
   {
     "neovim/nvim-lspconfig",
-    event = { "BufReadPre", "BufNewFile" }, -- Load when opening files.
-    lazy = true, -- Make it lazy load for better performance.
+    event = { "BufReadPre", "BufNewFile" },
+    lazy = true,
     dependencies = {
-      "mason-org/mason-lspconfig.nvim", -- Bridges Mason (installer) and LSPConfig.
+      "mason-org/mason-lspconfig.nvim",
     },
     config = function()
-      -- Function to set up LSP keybindings for a specific buffer.
       local function setup_keymaps(bufnr)
-        -- Helper function to create keymaps with common options.
         local function map(mode, lhs, rhs, desc)
           vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc, silent = true })
         end
@@ -23,18 +20,11 @@ return {
         map("i", "<C-k>", vim.lsp.buf.signature_help, "Signature Help") -- Same in insert mode.
 
         -- Navigation (g prefix) - Go to definitions, references, etc.
-        -- Note: gd, gD, gr, gI, gy are handled by Snacks plugin instead.
         map("n", "gd", vim.lsp.buf.definition, "Go to Definition")
         map("n", "gD", vim.lsp.buf.declaration, "Go to Declaration")
         map("n", "gr", vim.lsp.buf.references, "Find References")
-        map("n", "gI", vim.lsp.buf.implementation, "Go to Implementation")
         map("n", "gi", vim.lsp.buf.implementation, "Implementation") -- Go to implementation.
         map("n", "gt", vim.lsp.buf.type_definition, "Type Definition") -- Go to type definition.
-        -- Open definition in vertical split.
-        map("n", "<leader>v", function()
-          vim.cmd("vsplit")
-          vim.lsp.buf.definition()
-        end, "Definition in Split")
 
         -- Diagnostics Navigation ([ and ] prefix like Vim's quickfix).
         map("n", "[d", function()
@@ -54,34 +44,33 @@ return {
       end
 
       -- LSP Attach Handler: Runs when an LSP server attaches to a buffer.
-      -- Sets up keymaps and features for that buffer.
 
       vim.api.nvim_create_autocmd("LspAttach", {
-        group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true }), -- Unique group name.
+        group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true }),
         callback = function(args)
-          local bufnr = args.buf -- Buffer number where LSP attached.
-          local client = vim.lsp.get_client_by_id(args.data.client_id) -- The LSP client.
+          local bufnr = args.buf
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
           if not client then
-            return -- Safety check.
+            return
           end
 
-          setup_keymaps(bufnr) -- Set up the keybindings for this buffer.
+          setup_keymaps(bufnr)
 
           -- Document Highlight: Highlight other occurrences of symbol under cursor.
           if client.server_capabilities.documentHighlightProvider then -- If server supports it.
-            local group = -- Create unique group for this buffer's highlights.
+            local group =
               vim.api.nvim_create_augroup("LspDocumentHighlight_" .. bufnr, { clear = true })
             -- When cursor stays still, highlight references.
             vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
               buffer = bufnr,
               group = group,
-              callback = vim.lsp.buf.document_highlight, -- Highlight references.
+              callback = vim.lsp.buf.document_highlight,
             })
             -- When cursor moves, clear the highlights.
             vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
               buffer = bufnr,
               group = group,
-              callback = vim.lsp.buf.clear_references, -- Clear highlights.
+              callback = vim.lsp.buf.clear_references,
             })
           end
         end,
@@ -90,20 +79,20 @@ return {
       -- Diagnostic Configuration: How error/warning messages appear.
       vim.diagnostic.config({
         virtual_text = false, -- Don't show inline text (use tiny-inline-diagnostic instead).
-        underline = true, -- Underline problematic code.
-        update_in_insert = false, -- Don't update diagnostics while typing.
-        severity_sort = true, -- Sort by severity (errors first).
-        float = { border = "rounded", source = true, header = "", prefix = "" }, -- Floating window style.
-        signs = { -- Icons in the sign column (left side).
+        underline = true,
+        update_in_insert = false,
+        severity_sort = true,
+        float = { border = "rounded", source = true, header = "", prefix = "" },
+        signs = {
           text = {
-            [vim.diagnostic.severity.ERROR] = "󰅚 ", -- Error icon.
-            [vim.diagnostic.severity.WARN] = "󰀪 ", -- Warning icon.
-            [vim.diagnostic.severity.INFO] = "󰋽 ", -- Info icon.
-            [vim.diagnostic.severity.HINT] = "󰌶 ", -- Hint icon.
+            [vim.diagnostic.severity.ERROR] = "󰅚 ",
+            [vim.diagnostic.severity.WARN] = "󰀪 ",
+            [vim.diagnostic.severity.INFO] = "󰋽 ",
+            [vim.diagnostic.severity.HINT] = "󰌶 ",
           },
-          numhl = { -- Highlighting for line numbers.
-            [vim.diagnostic.severity.ERROR] = "ErrorMsg", -- Error color.
-            [vim.diagnostic.severity.WARN] = "WarningMsg", -- Warning color.
+          numhl = {
+            [vim.diagnostic.severity.ERROR] = "ErrorMsg",
+            [vim.diagnostic.severity.WARN] = "WarningMsg",
           },
         },
       })

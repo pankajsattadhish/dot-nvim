@@ -1,135 +1,173 @@
 return {
-  ------------------------------------------------------------
-  -- MASON (install LSP/formatters/linters)
-  ------------------------------------------------------------
-  {
-    "mason-org/mason.nvim",
-    lazy = false,
-    cmd = "Mason",
-    config = function()
-      require("mason").setup()
-    end,
-  },
+	-- MASON: The core package manager for external binaries
+	{
+		"williamboman/mason.nvim",
+		cmd = "Mason",
+		build = ":MasonUpdate",
+		opts = {
+			ui = { border = "rounded" },
+		},
+		config = function(_, opts)
+			require("mason").setup(opts)
+		end,
+	},
 
-  ------------------------------------------------------------
-  -- MASON + LSPCONFIG bridge
-  ------------------------------------------------------------
-  {
-    "mason-org/mason-lspconfig.nvim",
-    lazy = false,
-    dependencies = { "neovim/nvim-lspconfig" },
-    config = function()
-      local mason_lspconfig = require("mason-lspconfig")
-      local lspconfig = require("lspconfig")
-      local capabilities = require("core.utils").get_lsp_capabilities()
+	-- MASON-LSPCONFIG: Bridges Mason with nvim-lspconfig
+	{
+		"williamboman/mason-lspconfig.nvim",
+		dependencies = { "neovim/nvim-lspconfig" },
+		config = function()
+			local lspconfig = require("lspconfig")
+			local capabilities = require("core.utils").get_lsp_capabilities()
 
-      -- Basic default handler
-      local function default(server)
-        lspconfig[server].setup({ capabilities = capabilities })
-      end
+			local function default_setup(server)
+				lspconfig[server].setup({ capabilities = capabilities })
+			end
 
-      mason_lspconfig.setup({
-        handlers = {
-          default,
+			require("mason-lspconfig").setup({
+				handlers = {
+					-- The default handler: sets up any server not specifically mentioned below
+					function(server_name)
+						require("lspconfig")[server_name].setup({
+							capabilities = capabilities,
+						})
+					end,
 
-          ------------------------------------------------------------
-          -- JavaScript / TypeScript / React
-          ------------------------------------------------------------
-          ["ts_ls"] = function()
-            lspconfig.ts_ls.setup({
-              capabilities = capabilities,
-              settings = {
-                typescript = { inlayHints = { includeInlayParameterNameHints = "all" } },
-                javascript = { inlayHints = { includeInlayParameterNameHints = "all" } },
-              },
-            })
-          end,
+					-- Markdown: Fixed to attach even in single files without .git
+					["marksman"] = function()
+						local lspconfig = require("lspconfig")
+						lspconfig.marksman.setup({
+							capabilities = capabilities,
+							root_dir = function(fname)
+								-- Looks for project markers, falls back to current directory so it ALWAYS starts
+								return lspconfig.util.root_pattern(".git", ".marksman.toml", "README.md")(fname)
+									or vim.fs.dirname(fname)
+							end,
+						})
+					end,
 
-          ------------------------------------------------------------
-          -- Python
-          ------------------------------------------------------------
-          ["pyright"] = function()
-            lspconfig.pyright.setup({
-              capabilities = capabilities,
-              settings = {
-                python = {
-                  analysis = {
-                    typeCheckingMode = "basic",
-                    autoSearchPaths = true,
-                    useLibraryCodeForTypes = true,
-                  },
-                },
-              },
-            })
-          end,
+					-- JavaScript / TypeScript / React
+					["ts_ls"] = function()
+						lspconfig.ts_ls.setup({
+							capabilities = capabilities,
 
-          ------------------------------------------------------------
-          -- C/C++
-          ------------------------------------------------------------
-          ["clangd"] = function()
-            lspconfig.clangd.setup({
-              capabilities = capabilities,
-              cmd = {
-                "clangd",
-                "--background-index",
-                "--clang-tidy",
-                "--header-insertion=iwyu",
-              },
-            })
-          end,
+							root_dir = lspconfig.util.root_pattern(
+								"package.json",
+								"tsconfig.json",
+								"jsconfig.json",
+								".git"
+							),
 
-          ------------------------------------------------------------
-          -- HTML / CSS
-          ------------------------------------------------------------
-          ["html"] = default,
-          ["cssls"] = default,
+							settings = {
+								typescript = {
+									inlayHints = {
+										includeInlayParameterNameHints = "literal",
+										includeInlayFunctionParameterTypeHints = true,
+										includeInlayVariableTypeHints = false,
+										includeInlayPropertyDeclarationTypeHints = true,
+										includeInlayEnumMemberValueHints = true,
+									},
+								},
+								javascript = {
+									inlayHints = {
+										includeInlayParameterNameHints = "literal",
+									},
+								},
+							},
+						})
+					end,
 
-          ------------------------------------------------------------
-          -- Java (using nvim-java plugin separately)
-          ------------------------------------------------------------
-          -- jdtls is NOT installed via mason
-          -- nvim-java manages its own JDTLS installation
-        },
-      })
-    end,
-  },
+					-- Python
+					["pyright"] = function()
+						require("lspconfig").pyright.setup({
+							capabilities = capabilities,
+							settings = {
+								python = {
+									analysis = {
+										typeCheckingMode = "basic",
+										autoSearchPaths = true,
+										useLibraryCodeForTypes = true,
+									},
+								},
+							},
+						})
+					end,
 
-  ------------------------------------------------------------
-  -- Mason-Tool-Installer (install only needed tools)
-  ------------------------------------------------------------
-  {
-    "WhoIsSethDaniel/mason-tool-installer.nvim",
-    lazy = false,
-    config = function()
-      require("mason-tool-installer").setup({
-        ensure_installed = {
-          ------------------------------------------------------------
-          -- LSP servers
-          ------------------------------------------------------------
-          "ts_ls",
-          "pyright",
-          "clangd",
-          "html",
-          "cssls",
+					-- C/C++
+					["clangd"] = function()
+						require("lspconfig").clangd.setup({
+							capabilities = capabilities,
+							cmd = {
+								"clangd",
+								"--background-index",
+								"--clang-tidy",
+								"--header-insertion=iwyu",
+								"--completion-style=detailed",
+								"--function-arg-placeholders",
+								"--fallback-style=llvm",
+							},
+						})
+					end,
+					["lua_ls"] = function()
+						require("lspconfig").lua_ls.setup({
+							settings = {
+								Lua = {
+									diagnostics = {
+										globals = { "vim" },
+									},
+									completion = {
+										callSnippet = "Replace",
+									},
+									workspace = {
+										library = {
+											vim.fn.stdpath("config") .. "/lua",
+											vim.fn.stdpath("data") .. "/site/pack/lazy/opt/nvim-lspconfig/lua",
+											"${3rd}/love2d/library",
+										},
+									},
+									telemetry = {
+										enable = false,
+									},
+								},
+							},
+						})
+					end,
+				},
+			})
+		end,
+	},
 
-          ------------------------------------------------------------
-          -- Linters
-          ------------------------------------------------------------
-          "eslint_d", -- JS/TS/React
-          "ruff", -- Python linter (also can format)
-          "htmlhint", -- HTML
-          "stylelint", -- CSS
-          "luacheck", -- for your config
+	-- MASON-TOOL-INSTALLER: Automates installation of all tools
+	{
+		"WhoIsSethDaniel/mason-tool-installer.nvim",
+		opts = {
+			ensure_installed = {
+				-- LSP servers
+				"ts_ls",
+				"pyright",
+				"clangd",
+				"html",
+				"cssls",
+				"marksman",
+				"lua_ls",
 
-          ------------------------------------------------------------
-          -- Formatters
-          ------------------------------------------------------------
-          "prettier", -- JS/TS/HTML/CSS
-          "black", -- Python
-          "clang-format", -- C++
-          "stylua", -- Lua (config)
-        },
-      })
-    end,
-  },
+				-- Linters
+				"eslint_d",
+				"ruff",
+				"htmlhint",
+				"stylelint",
+				"luacheck",
+				"markdownlint",
+
+				-- Formatters
+				"prettier",
+				"black",
+				"clang-format",
+				"stylua",
+			},
+		},
+		config = function(_, opts)
+			require("mason-tool-installer").setup(opts)
+		end,
+	},
 }

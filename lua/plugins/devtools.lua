@@ -1,200 +1,158 @@
+-- Plugins:
+-- Completion  - "saghen/blink.cmp"
+-- TreeSitter  - "nvim-treesitter/nvim-treesitter"
+-- Snippets - "L3MON4D3/LuaSnip"
+-- UndoTree - "mbbill/undotree"
+
 return {
-  ---------------------------------------------------------------------------
-  -- Refactoring: Treesitter-powered code refactors
-  ---------------------------------------------------------------------------
-  {
-    "ThePrimeagen/refactoring.nvim",
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter",
-      "nvim-lua/plenary.nvim",
-    },
-    config = function()
-      require("refactoring").setup()
-    end,
-    keys = {
-      -- Universal refactor picker
-      {
-        "<leader>rr",
-        function()
-          require("refactoring").select_refactor()
-        end,
-        mode = { "n", "x" },
-        desc = "Refactor: Select",
-      },
+	{
+		"saghen/blink.cmp",
+		dependencies = {
+			"rafamadriz/friendly-snippets",
+		},
+		version = "*", -- Use latest version.
+		config = function()
+			require("blink.cmp").setup({
+				snippets = { preset = "luasnip" },
+				signature = { enabled = true },
+				appearance = {
+					use_nvim_cmp_as_default = true,
+					nerd_font_variant = "mono",
+				},
+				sources = {
+					default = { "lsp", "path", "buffer", "snippets" },
+					providers = {
+						lazydev = {
+							name = "LazyDev",
+							module = "lazydev.integrations.blink",
+							score_offset = 100,
+						},
+						cmdline = {
+							min_keyword_length = 2,
+						},
+					},
+				},
+				keymap = {
+					["<C-space>"] = { "show", "hide", "show_documentation", "hide_documentation" }, -- Toggle completion/docs.
+					["<CR>"] = { "accept", "fallback" }, -- Accept completion or normal enter.
+				},
+				cmdline = {
+					enabled = true,
+					completion = { menu = { auto_show = true } },
+				},
+				completion = {
+					menu = {
+						border = "rounded",
+						scrolloff = 1,
+						scrollbar = false,
+						draw = {
+							padding = 1,
+							gap = 1,
+							columns = {
+								{ "kind_icon" },
+								{ "label", "label_description", gap = 1 },
+								{ "kind" },
+								{ "source_name" },
+							},
+						},
+					},
+					documentation = {
+						window = {
+							border = "rounded",
+							scrollbar = false,
+							winhighlight = "Normal:BlinkCmpDoc,FloatBorder:BlinkCmpDocBorder,EndOfBuffer:BlinkCmpDoc",
+						},
+						auto_show = true,
+						auto_show_delay_ms = 500,
+					},
+				},
+			})
 
-      -- Extract Function
-      {
-        "<leader>re",
-        function()
-          require("refactoring").refactor("Extract Function")
-        end,
-        mode = "x",
-        desc = "Refactor: Extract Function",
-      },
+			-- Load snippets from VSCode format (friendly-snippets).
+			require("luasnip.loaders.from_vscode").lazy_load()
+		end,
+	},
 
-      -- Extract Variable
-      {
-        "<leader>rv",
-        function()
-          require("refactoring").refactor("Extract Variable")
-        end,
-        mode = "x",
-        desc = "Refactor: Extract Variable",
-      },
-    },
-  },
-  ---------------------------------------------------------------------------
-  -- Project root detection
-  ---------------------------------------------------------------------------
-  {
-    "ahmedkhalf/project.nvim",
-    event = "VeryLazy",
-    config = function()
-      require("project_nvim").setup({
-        manual_mode = false,
-        detection_methods = { "lsp", "pattern" },
-        patterns = {
-          ".git",
-          "Makefile",
-          "package.json",
-          "pom.xml",
-          "build.gradle",
-          "Cargo.toml",
-          "go.mod",
-          "pyproject.toml",
-        },
-        show_hidden = true,
-      })
-    end,
-  },
+	-- Treesitter
+	{
+		"nvim-treesitter/nvim-treesitter",
+		branch = "master",
+		build = ":TSUpdate",
+		event = "BufReadPre",
+		dependencies = { {
+			"nvim-treesitter/nvim-treesitter-textobjects",
+			branch = "master",
+		} },
+		config = function()
+			require("nvim-treesitter.configs").setup({
+				modules = {},
+				ignore_install = {},
+				ensure_installed = {
+					"bash",
+					"c",
+					"html",
+					"javascript",
+					"json",
+					"lua",
+					"markdown",
+					"markdown_inline",
+					"python",
+					"rust",
+					"typescript",
+					"vim",
+					"vimdoc",
+					"yaml",
+				},
+				sync_install = false,
+				auto_install = true,
+				highlight = { enable = true, additional_vim_regex_highlighting = false },
+				indent = { enable = true },
+				textobjects = {
+					select = {
+						enable = true,
+						lookahead = true,
+						keymaps = {
+							["af"] = "@function.outer",
+							["if"] = "@function.inner",
+							["ac"] = "@class.outer",
+							["ic"] = "@class.inner",
+							["aa"] = "@parameter.outer",
+							["ia"] = "@parameter.inner",
+							["ai"] = "@conditional.outer",
+							["ii"] = "@conditional.inner",
+							["al"] = "@loop.outer",
+							["il"] = "@loop.inner",
+							["iB"] = "@block.inner",
+							["aB"] = "@block.outer",
+						},
+					},
+					move = {
+						enable = true,
+						set_jumps = true,
+						goto_next_start = {
+							["]m"] = "@function.outer",
+							["]]"] = "@class.outer",
+							["]a"] = "@parameter.inner",
+						},
+						goto_previous_start = {
+							["[m"] = "@function.outer",
+							["[["] = "@class.outer",
+							["[a"] = "@parameter.inner",
+						},
+					},
+				},
+			})
+		end,
+	},
 
-  ---------------------------------------------------------------------------
-  -- Git (CLI-first, Primeagen-approved)
-  ---------------------------------------------------------------------------
-  {
-    "tpope/vim-fugitive",
-    cmd = { "Git", "G", "Gdiffsplit", "Gread", "Gwrite" },
-    keys = {
-      { "<leader>Gs", "<cmd>Git<CR>", desc = "Fugitive: Status" },
-      { "<leader>Gc", "<cmd>Git commit<CR>", desc = "Fugitive: Commit" },
-      { "<leader>Gp", "<cmd>Git push<CR>", desc = "Fugitive: Push" },
-      { "<leader>Gl", "<cmd>Git log<CR>", desc = "Fugitive: Log" },
-    },
-  },
+	-- LuaSnip
+	{ "L3MON4D3/LuaSnip", keys = {} }, -- No default keys, blink.cmp handles them.
 
-  ---------------------------------------------------------------------------
-  -- Sessions
-  ---------------------------------------------------------------------------
-  {
-    "rmagatti/auto-session",
-    event = "VimEnter",
-    config = function()
-      require("auto-session").setup({
-        log_level = "error",
-        auto_restore_enabled = false,
-        auto_session_suppress_dirs = {
-          "~/",
-          "~/Downloads",
-          "/",
-        },
-      })
-    end,
-  },
-
-  ---------------------------------------------------------------------------
-  -- HTTP Client
-  ---------------------------------------------------------------------------
-  {
-    "mistweaverco/kulala.nvim",
-    ft = { "http" },
-    config = function()
-      require("kulala").setup({
-        default_view = "body",
-        default_env = "dev",
-        debug = false,
-        formatters = {
-          json = { "jq", "." },
-          xml = { "xmllint", "--format", "-" },
-          html = { "xmllint", "--format", "--html", "-" },
-        },
-      })
-    end,
-    keys = {
-      {
-        "<leader>rr",
-        function()
-          require("kulala").run()
-        end,
-        desc = "Run HTTP Request",
-      },
-      {
-        "<leader>ro",
-        function()
-          require("kulala").open()
-        end,
-        desc = "Open HTTP Response",
-      },
-      {
-        "<leader>rt",
-        function()
-          require("kulala").toggle_view()
-        end,
-        desc = "Toggle HTTP View",
-      },
-    },
-  },
-
-  ---------------------------------------------------------------------------
-  -- Database UI
-  ---------------------------------------------------------------------------
-  {
-    "tpope/vim-dadbod",
-    dependencies = {
-      "kristijanhusak/vim-dadbod-ui",
-      "kristijanhusak/vim-dadbod-completion",
-    },
-    cmd = {
-      "DBUI",
-      "DBUIToggle",
-      "DBUIAddConnection",
-      "DBUIFindBuffer",
-    },
-    keys = {
-      { "<leader>Db", "<cmd>DBUIToggle<CR>", desc = "Database UI" },
-    },
-  },
-
-  ---------------------------------------------------------------------------
-  -- Markdown preview
-  ---------------------------------------------------------------------------
-  {
-    "ellisonleao/glow.nvim",
-    cmd = { "Glow" },
-    ft = { "markdown" },
-    config = function()
-      require("glow").setup({
-        style = "dark",
-        width = 120,
-      })
-    end,
-    keys = {
-      { "<leader>mp", "<cmd>Glow<CR>", desc = "Markdown Preview" },
-    },
-  },
-
-  ---------------------------------------------------------------------------
-  -- Todo Comments (keep this)
-  ---------------------------------------------------------------------------
-  {
-    "folke/todo-comments.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    cmd = { "TodoTrouble", "TodoTelescope" },
-    event = "VeryLazy",
-    config = true,
-    keys = {
-      { "<leader>td", "<cmd>TodoTelescope<CR>", desc = "Todos" },
-      { "<leader>tq", "<cmd>TodoQuickFix<CR>", desc = "Todos QuickFix" },
-      { "<leader>tl", "<cmd>TodoLocList<CR>", desc = "Todos LocList" },
-    },
-  },
+	-- UndoTree
+	{
+		"mbbill/undotree",
+		keys = {
+			{ "<leader>uu", "<cmd>UndotreeToggle<CR>", desc = "Undo Tree" },
+		},
+	},
 }
