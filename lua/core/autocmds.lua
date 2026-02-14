@@ -1,113 +1,88 @@
 local api = vim.api
 
 -- Disable auto-comment continuation
-api.nvim_create_autocmd("BufEnter", { command = [[set formatoptions-=cro]] })
+api.nvim_create_autocmd("BufEnter", {
+	callback = function()
+		vim.opt.formatoptions:remove({ "c", "r", "o" })
+	end,
+})
 
 -- Highlight on yank
 api.nvim_create_autocmd("TextYankPost", {
-  callback = function()
-    vim.hl.on_yank()
-  end,
+	callback = function()
+		vim.highlight.on_yank({ timeout = 120 })
+	end,
 })
 
--- Remember cursor position
+-- Restore cursor position
 api.nvim_create_autocmd("BufReadPost", {
-  callback = function()
-    local mark = vim.api.nvim_buf_get_mark(0, '"')
-    local lines = vim.api.nvim_buf_line_count(0)
-    if mark[1] > 0 and mark[1] <= lines then
-      pcall(vim.api.nvim_win_set_cursor, 0, mark)
-    end
-  end,
+	callback = function()
+		local mark = api.nvim_buf_get_mark(0, '"')
+		local lines = api.nvim_buf_line_count(0)
+		if mark[1] > 0 and mark[1] <= lines then
+			pcall(api.nvim_win_set_cursor, 0, mark)
+		end
+	end,
 })
 
 -- Cursorline only in active window
-local group = api.nvim_create_augroup("CursorLine", { clear = true })
-api.nvim_create_autocmd({ "InsertLeave", "WinEnter" }, {
-  command = "set cursorline",
-  group = group,
-})
-api.nvim_create_autocmd({ "InsertEnter", "WinLeave" }, {
-  command = "set nocursorline",
-  group = group,
+local cursor_grp = api.nvim_create_augroup("CursorLineToggle", { clear = true })
+
+api.nvim_create_autocmd({ "WinEnter", "InsertLeave" }, {
+	group = cursor_grp,
+	callback = function()
+		vim.wo.cursorline = true
+	end,
 })
 
--- Spell checking for text/markdown/tex
+api.nvim_create_autocmd({ "WinLeave", "InsertEnter" }, {
+	group = cursor_grp,
+	callback = function()
+		vim.wo.cursorline = false
+	end,
+})
+
+-- Spell checking for writing files
+
 api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-  pattern = { "*.txt", "*.md", "*.tex" },
-  callback = function()
-    vim.opt.spell = true
-    vim.opt.spelllang = "en"
-  end,
+	pattern = { "*.md", "*.txt", "*.tex" },
+	callback = function()
+		vim.opt_local.spell = true
+		vim.opt_local.spelllang = "en"
+	end,
 })
 
--- Close special buffers with q
+-- Close temporary buffers with 'q'
+local close_q = api.nvim_create_augroup("CloseWithQ", { clear = true })
+
 api.nvim_create_autocmd("FileType", {
-  group = api.nvim_create_augroup("close_with_q", { clear = true }),
-  pattern = {
-    "PlenaryTestPopup",
-    "help",
-    "lspinfo",
-    "man",
-    "notify",
-    "qf",
-    "spectre_panel",
-    "startuptime",
-    "tsplayground",
-    "neotest-output",
-    "checkhealth",
-    "neotest-summary",
-    "neotest-output-panel",
-  },
-  callback = function(ev)
-    vim.bo[ev.buf].buflisted = false
-    vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = ev.buf, silent = true })
-  end,
+	group = close_q,
+	pattern = {
+		"help",
+		"qf",
+		"man",
+		"lspinfo",
+		"checkhealth",
+		"oil",
+	},
+	callback = function(ev)
+		vim.bo[ev.buf].buflisted = false
+		vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = ev.buf, silent = true })
+	end,
 })
 
--- Resize splits automatically
+-- Equalize splits on resize
 api.nvim_create_autocmd("VimResized", {
-  callback = function()
-    vim.cmd("wincmd =")
-  end,
-})
-
--- Fix commentstring for terraform/hcl
-api.nvim_create_autocmd("FileType", {
-  group = api.nvim_create_augroup("FixTerraformCommentString", { clear = true }),
-  pattern = { "terraform", "hcl" },
-  callback = function(ev)
-    vim.bo[ev.buf].commentstring = "# %s"
-  end,
+	callback = function()
+		vim.cmd("wincmd =")
+	end,
 })
 
 -- External file change detection
-api.nvim_create_autocmd({ "FocusGained", "BufEnter" }, {
-  callback = function()
-    if vim.fn.mode() ~= "c" then
-      vim.cmd("checktime")
-    end
-  end,
-})
-
--- Soft word wrapping for mail files
-api.nvim_create_autocmd("Filetype", {
-  pattern = "mail",
-  callback = function()
-    vim.opt_local.wrap = true
-    vim.opt_local.linebreak = true
-    vim.opt_local.textwidth = 0
-    vim.opt_local.wrapmargin = 0
-    vim.opt_local.colorcolumn = "80"
-  end,
-})
-
--- Auto-persist per project
-vim.api.nvim_create_autocmd("User", {
-  pattern = "PersistenceLoadPost",
-  callback = function()
-    pcall(function()
-      require("harpoon"):load()
-    end)
-  end,
+api.nvim_create_autocmd({ "FocusGained", "BufEnter", "TermLeave" }, {
+	callback = function()
+		if vim.fn.mode() ~= "c" then
+			vim.cmd("checktime")
+		end
+	end,
 })
