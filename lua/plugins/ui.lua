@@ -11,7 +11,6 @@ return {
 
 			vim.cmd("colorscheme vague")
 
-			vim.api.nvim_set_hl(0, "SnacksIndentScope", { fg = "#DCD7BA", bold = true })
 			-- vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 			-- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 		end,
@@ -105,6 +104,16 @@ return {
 
 			-- Disable default virtual_text (we use tiny-inline)
 			vim.diagnostic.config({ virtual_text = false })
+		end,
+	},
+	{
+		"lukas-reineke/indent-blankline.nvim",
+		main = "ibl",
+		---@module "ibl"
+		---@type ibl.config
+		opts = {},
+		config = function()
+			require("ibl").setup()
 		end,
 	},
 }
