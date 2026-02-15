@@ -13,7 +13,7 @@ vim.opt.inccommand = "split"
 
 vim.opt.number = true
 vim.opt.relativenumber = true
-vim.opt.signcolumn = "yes:1"
+vim.opt.signcolumn = "yes"
 vim.opt.cursorline = true
 vim.opt.colorcolumn = "80"
 vim.opt.scrolloff = 8
