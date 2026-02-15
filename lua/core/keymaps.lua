@@ -46,50 +46,99 @@ map("n", "<leader>dv", function()
 	vim.diagnostic.config({ virtual_text = not config.virtual_text })
 end, { desc = "Diag Virt Txt" })
 
--- Toggles
-
--- toggle wrap
-map("n", "<leader>tw", function()
-	vim.opt.wrap = not vim.opt.wrap:get()
-end, { desc = "Toggle wrap" })
-
--- toggle diagnostic
-map("n", "<leader>td", function()
-	if vim.diagnostic.is_enabled() then
-		vim.diagnostic.enable(false)
-	else
-		vim.diagnostic.enable()
-	end
-end, { desc = "Toggle diagnostics" })
-
--- toggle indent lines
-local ibl_enabled = true
-map("n", "<leader>ti", function()
-	ibl_enabled = not ibl_enabled
-	if ibl_enabled then
-		require("ibl").setup()
-	else
-		vim.cmd("IBLDisable")
-	end
-end, { desc = "Toggle indent lines" })
-
--- toggle inlay hints
-map("n", "<leader>th", function()
-	vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
-end, { desc = "Toggle inlay hints" })
-
--- toggle spell
-map("n", "<leader>ts", function()
-	vim.opt.spell = not vim.opt.spell:get()
-end, { desc = "Toggle spell" })
-
 -- references
-map({ "n", "t" }, "]r", function()
+map("n", "]r", function()
 	vim.cmd("cnext")
 end, { desc = "Next Reference" })
 
-map({ "n", "t" }, "[r", function()
+map("n", "[r", function()
 	vim.cmd("cprev")
 end, { desc = "Prev Reference" })
 
+-- Terminal toggle
+local term_buf = nil
+local term_win = nil
+local term_orientation = nil -- "horizontal" or "vertical"
 
+local function close_terminal()
+	if term_win and vim.api.nvim_win_is_valid(term_win) then
+		vim.api.nvim_win_close(term_win, true)
+		term_win = nil
+		term_orientation = nil
+	end
+end
+
+local function open_terminal_horizontal()
+	close_terminal()
+
+	local height = math.floor(vim.o.lines * 0.4)
+	vim.cmd("botright split")
+	vim.cmd("resize " .. height)
+
+	term_win = vim.api.nvim_get_current_win()
+	term_orientation = "horizontal"
+
+	if not term_buf or not vim.api.nvim_buf_is_valid(term_buf) then
+		term_buf = vim.api.nvim_create_buf(false, true)
+		vim.api.nvim_win_set_buf(term_win, term_buf)
+		vim.fn.termopen(vim.o.shell)
+	else
+		vim.api.nvim_win_set_buf(term_win, term_buf)
+	end
+
+	vim.cmd("startinsert")
+
+	vim.opt_local.number = false
+	vim.opt_local.relativenumber = false
+	vim.opt_local.signcolumn = "no"
+end
+
+local function open_terminal_vertical()
+	close_terminal()
+
+	local width = math.floor(vim.o.columns * 0.4)
+	vim.cmd("botright vsplit")
+	vim.cmd("vertical resize " .. width)
+
+	term_win = vim.api.nvim_get_current_win()
+	term_orientation = "vertical"
+
+	if not term_buf or not vim.api.nvim_buf_is_valid(term_buf) then
+		term_buf = vim.api.nvim_create_buf(false, true)
+		vim.api.nvim_win_set_buf(term_win, term_buf)
+		vim.fn.termopen(vim.o.shell)
+	else
+		vim.api.nvim_win_set_buf(term_win, term_buf)
+	end
+
+	vim.cmd("startinsert")
+
+	vim.opt_local.number = false
+	vim.opt_local.relativenumber = false
+	vim.opt_local.signcolumn = "yes"
+end
+
+local function toggle_terminal_horizontal()
+	if term_orientation == "horizontal" and term_win and vim.api.nvim_win_is_valid(term_win) then
+		-- Horizontal is already open, close it
+		close_terminal()
+	else
+		-- Open horizontal (will close vertical if open)
+		open_terminal_horizontal()
+	end
+end
+
+local function toggle_terminal_vertical()
+	if term_orientation == "vertical" and term_win and vim.api.nvim_win_is_valid(term_win) then
+		-- Vertical is already open, close it
+		close_terminal()
+	else
+		-- Open vertical (will close horizontal if open)
+		open_terminal_vertical()
+	end
+end
+
+-- Keymaps for terminal toggle
+map({ "n", "t" }, "<C-/>", toggle_terminal_horizontal, { desc = "Toggle Horizontal Terminal" })
+map({ "n", "t" }, "<C-_>", toggle_terminal_horizontal, { desc = "Toggle Horizontal Terminal" })
+map({ "n", "t" }, "<C-\\>", toggle_terminal_vertical, { desc = "Toggle Vertical Terminal" })

@@ -164,45 +164,6 @@ return {
 			if root then
 				vim.cmd("cd " .. vim.fs.dirname(root))
 			end
-
-			------------------------------------------------------------------
-			-- PERSISTENT TERMINAL (40%)
-			------------------------------------------------------------------
-			local term_buf = nil
-			local term_win = nil
-
-			local function toggle_terminal()
-				if term_buf and vim.api.nvim_buf_is_valid(term_buf) then
-					if term_win and vim.api.nvim_win_is_valid(term_win) then
-						vim.api.nvim_win_close(term_win, true)
-						term_win = nil
-						return
-					end
-				end
-
-				local height = math.floor(vim.o.lines * 0.4)
-				vim.cmd("botright split")
-				vim.cmd("resize " .. height)
-
-				term_win = vim.api.nvim_get_current_win()
-
-				if not term_buf or not vim.api.nvim_buf_is_valid(term_buf) then
-					term_buf = vim.api.nvim_create_buf(false, true)
-					vim.api.nvim_win_set_buf(term_win, term_buf)
-					vim.fn.termopen(vim.o.shell)
-				else
-					vim.api.nvim_win_set_buf(term_win, term_buf)
-				end
-
-				vim.cmd("startinsert")
-
-				vim.opt_local.number = false
-				vim.opt_local.relativenumber = false
-				vim.opt_local.signcolumn = "no"
-			end
-
-			vim.keymap.set({ "n", "t" }, "<C-/>", toggle_terminal, { desc = "Toggle Terminal" })
-			vim.keymap.set({ "n", "t" }, "<C-_>", toggle_terminal, { desc = "Toggle Terminal" })
 		end,
 	},
 }
