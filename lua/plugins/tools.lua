@@ -33,18 +33,56 @@ return {
 						})
 					end,
 
-					-- Markdown: Fixed to attach even in single files without .git
-					["marksman"] = function()
-						local lspconfig = require("lspconfig")
-						lspconfig.marksman.setup({
-							capabilities = capabilities,
-							root_dir = function(fname)
-								-- Looks for project markers, falls back to current directory so it ALWAYS starts
-								return lspconfig.util.root_pattern(".git", ".marksman.toml", "README.md")(fname)
-									or vim.fs.dirname(fname)
-							end,
-						})
-					end,
+				-- Markdown: Fixed to attach even in single files without .git
+				["marksman"] = function()
+					local lspconfig = require("lspconfig")
+					lspconfig.marksman.setup({
+						capabilities = capabilities,
+						root_dir = function(fname)
+							-- Looks for project markers, falls back to current directory so it ALWAYS starts
+							return lspconfig.util.root_pattern(".git", ".marksman.toml", "README.md")(fname)
+								or vim.fs.dirname(fname)
+						end,
+					})
+				end,
+
+				-- Tailwind CSS
+				["tailwindcss"] = function()
+					lspconfig.tailwindcss.setup({
+						capabilities = capabilities,
+						root_dir = lspconfig.util.root_pattern(
+							"tailwind.config.js",
+							"tailwind.config.ts",
+							"tailwind.config.cjs",
+							"postcss.config.js",
+							"package.json",
+							".git"
+						),
+						settings = {
+							tailwindCSS = {
+								experimental = {
+									classRegex = {
+										{ "cx\\(([^)]*)\\)", "(className|class)=[\"']([^\"']+)[\"']" },
+									},
+								},
+							},
+						},
+					})
+				end,
+
+				-- ESLint (better IDE features than eslint_d)
+				["eslint"] = function()
+					lspconfig.eslint.setup({
+						capabilities = capabilities,
+						on_attach = function(client, bufnr)
+							-- Auto-fix on save
+							vim.api.nvim_create_autocmd("BufWritePre", {
+								buffer = bufnr,
+								command = "EslintFixAll",
+							})
+						end,
+					})
+				end,
 
 					-- JavaScript / TypeScript / React
 					["ts_ls"] = function()
@@ -144,6 +182,8 @@ return {
 			ensure_installed = {
 				-- LSP servers
 				"ts_ls",
+				"eslint",
+				"tailwindcss",
 				"pyright",
 				"clangd",
 				"html",
@@ -164,6 +204,7 @@ return {
 				"black",
 				"clang-format",
 				"stylua",
+				"google-java-format",
 			},
 		},
 		config = function(_, opts)

@@ -1,7 +1,3 @@
--- Auto-Detect Indent - "tpope/vim-sleuth"
--- Commenting - 		"numToStr/Comment.nvim"
--- Formatter - "stevearc/conform.nvim"
-
 return {
 	-- Sleuth: auto-detect indent. Lightweight, essential.
 	{ "tpope/vim-sleuth" },
@@ -55,6 +51,7 @@ return {
 				sh = { "shfmt" },
 				bash = { "shfmt" },
 				rust = { "rustfmt" },
+				java = { "google-java-format" },
 			},
 			default_format_opts = {
 				lsp_format = "fallback", -- Use LSP formatting if no formatter available.
