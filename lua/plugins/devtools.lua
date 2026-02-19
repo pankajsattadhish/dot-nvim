@@ -1,9 +1,3 @@
--- Plugins:
--- Completion  - "saghen/blink.cmp"
--- TreeSitter  - "nvim-treesitter/nvim-treesitter"
--- Snippets - "L3MON4D3/LuaSnip"
--- UndoTree - "mbbill/undotree"
-
 return {
 	{
 		"saghen/blink.cmp",
@@ -22,11 +16,6 @@ return {
 				sources = {
 					default = { "lsp", "path", "buffer", "snippets" },
 					providers = {
-						lazydev = {
-							name = "LazyDev",
-							module = "lazydev.integrations.blink",
-							score_offset = 100,
-						},
 						cmdline = {
 							min_keyword_length = 2,
 						},
@@ -91,6 +80,7 @@ return {
 					"bash",
 					"c",
 					"html",
+					"java",
 					"javascript",
 					"json",
 					"lua",

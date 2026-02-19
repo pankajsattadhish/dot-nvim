@@ -51,6 +51,6 @@ return {
       },
     })
 
-    -- Auto LSP setup handled internally — no jdtls config needed
-  end,
+		-- Auto LSP setup handled internally — no jdtls config needed
+	end,
 }
