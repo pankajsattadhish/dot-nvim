@@ -34,15 +34,10 @@ vim.g.netrw_banner = 0
 
 -- folds
 vim.opt.foldlevel = 99
-vim.opt.foldenable = false
-
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "markdown" },
-  callback = function()
-    vim.opt_local.foldmethod = "expr"
-    vim.opt_local.foldexpr = "nvim_treesitter#foldexpr()"
-    vim.opt_local.foldenable = true
-  end,
-})
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+vim.opt.foldenable = true
+vim.opt.foldmethod = "expr"
 
 vim.opt.conceallevel = 2
+vim.opt.showmode = false
+vim.wildmenu = true

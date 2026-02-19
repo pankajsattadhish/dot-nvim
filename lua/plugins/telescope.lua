@@ -5,7 +5,6 @@ return {
 			"nvim-lua/plenary.nvim",
 			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 			"nvim-telescope/telescope-ui-select.nvim",
-			"aznhe21/actions-preview.nvim",
 		},
 
 		cmd = "Telescope",
@@ -61,31 +60,23 @@ return {
 				desc = "References",
 			},
 			{
+				"<leader>ph",
+				function()
+					require("telescope.builtin").help_tags()
+				end,
+				desc = "Help",
+			},
+			{
 				"<leader>dd",
 				function()
 					require("telescope.builtin").diagnostics({
 						layout_strategy = "vertical",
-						layout_config = {
-							width = 0.6,
-							height = 0.6,
-							preview_height = 0.4,
-						},
 						sorting_strategy = "ascending",
 					})
 				end,
 				desc = "Diagnostics",
 			},
 
-			------------------------------------------------------------------
-			-- CODE ACTIONS
-			------------------------------------------------------------------
-			{
-				"<leader>ca",
-				function()
-					require("actions-preview").code_actions()
-				end,
-				desc = "Code Actions",
-			},
 		},
 
 		config = function()
@@ -151,10 +142,6 @@ return {
 
 			telescope.load_extension("fzf")
 			telescope.load_extension("ui-select")
-
-			require("actions-preview").setup({
-				backend = { "telescope" },
-			})
 
 			------------------------------------------------------------------
 			-- PROJECT ROOT (SET ONCE)

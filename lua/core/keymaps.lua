@@ -4,6 +4,8 @@ local map = vim.keymap.set
 map("v", "J", ":m '>+1<CR>gv=gv", { silent = true })
 map("v", "K", ":m '<-2<CR>gv=gv", { silent = true })
 
+map("n", "G", "Gzz")
+
 -- Indent
 map("v", "<", "<gv")
 map("v", ">", ">gv")
