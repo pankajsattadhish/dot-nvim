@@ -78,7 +78,7 @@ return {
 
       -- Diagnostic Configuration: How error/warning messages appear.
       vim.diagnostic.config({
-        virtual_text = false, -- Don't show inline text (use tiny-inline-diagnostic instead).
+        virtual_text = true, -- Show inline diagnostics (Primeagen style - no fancy plugins).
         underline = true,
         update_in_insert = false,
         severity_sort = true,
