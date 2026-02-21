@@ -5,6 +5,7 @@ return {
 			"nvim-lua/plenary.nvim",
 			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 			"nvim-telescope/telescope-ui-select.nvim",
+			"echasnovski/mini.icons",
 		},
 
 		cmd = "Telescope",
@@ -16,32 +17,21 @@ return {
 					local builtin = require("telescope.builtin")
 					local themes = require("telescope.themes")
 
-					local opts = themes.get_dropdown({
+					builtin.find_files(themes.get_dropdown({
+						hidden = true,
 						previewer = false,
-						layout_config = { width = 0.5, height = 0.5 },
-					})
-
-					local ok = pcall(
-						builtin.git_files,
-						vim.tbl_extend("force", opts, {
-							show_untracked = true,
-						})
-					)
-
-					if not ok then
-						builtin.find_files(vim.tbl_extend("force", opts, { hidden = true }))
-					end
+						layout_config = {
+							width = 0.5,
+							height = 0.5,
+						},
+					}))
 				end,
-				desc = "Fast File Switch",
+				desc = "File Search",
 			},
 			{
 				"<leader>pf",
 				function()
-					local builtin = require("telescope.builtin")
-					local ok = pcall(builtin.git_files, { show_untracked = true })
-					if not ok then
-						builtin.find_files({ hidden = true })
-					end
+					require("telescope.builtin").find_files({ hidden = true })
 				end,
 				desc = "Project Files",
 			},
@@ -53,6 +43,20 @@ return {
 				desc = "Live Grep",
 			},
 			{
+				"<leader>/",
+				function()
+					require("telescope.builtin").current_buffer_fuzzy_find()
+				end,
+				desc = "Buffer Live Grep",
+			},
+			{
+				"<leader>pb",
+				function()
+					require("telescope.builtin").buffers()
+				end,
+				desc = "Buffers",
+			},
+			{
 				"<leader>pr",
 				function()
 					require("telescope.builtin").lsp_references()
@@ -60,11 +64,67 @@ return {
 				desc = "References",
 			},
 			{
-				"<leader>ph",
+				"<leader>pm",
 				function()
-					require("telescope.builtin").help_tags()
+					require("telescope.builtin").man_pages()
 				end,
-				desc = "Help",
+				desc = "Man Pages",
+			},
+			{
+				"<leader>pt",
+				function()
+					require("telescope.builtin").builtin()
+				end,
+				desc = "Telescope Builtin",
+			},
+			{
+				"<leader>gb",
+				function()
+					require("telescope.builtin").git_bcommits((require("telescope.themes").get_ivy()))
+				end,
+				desc = "Git BCommits",
+			},
+			{
+				"<leader>gf",
+				function()
+					require("telescope.builtin").git_files()
+				end,
+				desc = "Git Files",
+			},
+			{
+				"<leader>gB",
+				function()
+					require("telescope.builtin").git_branches({
+						layout_strategy = "horizontal",
+						layout_config = {
+							width = 0.99, -- full editor width
+							height = 0.99, -- almost full height (adjust if needed)
+							preview_width = 0.70,
+						},
+					})
+				end,
+				desc = "Git Branches",
+			},
+			{
+				"<leader>gC",
+				function()
+					require("telescope.builtin").git_commits(require("telescope.themes").get_ivy())
+				end,
+				desc = "Git Commits",
+			},
+			{
+				"<leader>gs",
+				function()
+					require("telescope.builtin").git_status({
+						layout_strategy = "horizontal",
+						layout_config = {
+							width = 0.99, -- full editor width
+							height = 0.99, -- almost full height (adjust if needed)
+							preview_width = 0.70,
+						},
+					})
+				end,
+				desc = "Git Status Picker (Full Width)",
 			},
 			{
 				"<leader>dd",
@@ -76,16 +136,29 @@ return {
 				end,
 				desc = "Diagnostics",
 			},
-
 		},
 
 		config = function()
 			local telescope = require("telescope")
 
+			local ignore_globs = {
+				"--glob=!node_modules/*",
+				"--glob=!.git/*",
+				"--glob=!dist/*",
+				"--glob=!build/*",
+				"--glob=!.next/*",
+			}
+
 			telescope.setup({
 				defaults = {
 					sorting_strategy = "ascending",
 					layout_strategy = "horizontal",
+
+					layout_config = {
+						horizontal = {
+							preview_width = 0.60,
+						},
+					},
 
 					-- MERN repo optimization
 					file_ignore_patterns = {
@@ -100,7 +173,7 @@ return {
 						"yarn.lock",
 					},
 
-					vimgrep_arguments = {
+					vimgrep_arguments = vim.tbl_flatten({
 						"rg",
 						"--color=never",
 						"--no-heading",
@@ -109,31 +182,24 @@ return {
 						"--column",
 						"--smart-case",
 						"--hidden",
-						"--glob=!node_modules/*",
-						"--glob=!.git/*",
-						"--glob=!dist/*",
-						"--glob=!build/*",
-						"--glob=!.next/*",
-					},
+						ignore_globs,
+					}),
 				},
 
 				pickers = {
 					find_files = {
 						hidden = true,
-						find_command = {
+						find_command = vim.tbl_flatten({
 							"rg",
 							"--files",
 							"--hidden",
-							"--glob=!node_modules/*",
-							"--glob=!.git/*",
-							"--glob=!dist/*",
-							"--glob=!build/*",
-							"--glob=!.next/*",
-						},
+							ignore_globs,
+						}),
 					},
 				},
 
 				extensions = {
+					fzf = {},
 					["ui-select"] = {
 						require("telescope.themes").get_dropdown({}),
 					},
@@ -142,15 +208,6 @@ return {
 
 			telescope.load_extension("fzf")
 			telescope.load_extension("ui-select")
-
-			------------------------------------------------------------------
-			-- PROJECT ROOT (SET ONCE)
-			------------------------------------------------------------------
-			local markers = { ".git", "package.json" }
-			local root = vim.fs.find(markers, { upward = true })[1]
-			if root then
-				vim.cmd("cd " .. vim.fs.dirname(root))
-			end
 		end,
 	},
 }
