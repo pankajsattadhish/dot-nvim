@@ -1,106 +1,41 @@
 return {
-
-	-- Mini.nvim (Core + Pick)
+	-- Mini.nvim (Core modules)
 	{
-		"echasnovski/mini.nvim",
+		"nvim-mini/mini.nvim",
 		version = false,
-
-		-- Lazy-load picker on key usage
-		-- keys = {
-		--   -- Files
-		--   {
-		--     "<leader>pf",
-		--     function() require("mini.pick").builtin.files() end,
-		--     desc = "Files",
-		--   },
-		--   {
-		--     "<C-p>",
-		--     function() require("mini.pick").builtin.files() end,
-		--     desc = "Files",
-		--   },
-		--
-		--   -- Live Grep
-		--   {
-		--     "<leader>ps",
-		--     function() require("mini.pick").builtin.grep_live() end,
-		--     desc = "Live Grep",
-		--     mode = { "n", "x" },
-		--   },
-		--
-		--   -- Buffers
-		--   {
-		--     "<leader>bo",
-		--     function() require("mini.pick").builtin.buffers() end,
-		--     desc = "Buffers",
-		--   },
-		--
-		--   -- Diagnostics
-		--   {
-		--     "<leader>dd",
-		--     function() require("mini.pick").builtin.diagnostics() end,
-		--     desc = "Diagnostics",
-		--   },
-		--   {
-		--     "<leader>dD",
-		--     function()
-		--       require("mini.pick").builtin.diagnostics({ scope = "current" })
-		--     end,
-		--     desc = "Buffer Diagnostics",
-		--   },
-		--
-		--   -- Quickfix / Location list
-		--   {
-		--     "<leader>dq",
-		--     function() require("mini.pick").builtin.quickfix() end,
-		--     desc = "Quickfix",
-		--   },
-		--   {
-		--     "<leader>dl",
-		--     function() require("mini.pick").builtin.loclist() end,
-		--     desc = "Location List",
-		--   },
-		--
-		--   -- LSP
-		--   {
-		--     "<leader>pr",
-		--     function() require("mini.pick").builtin.lsp_references() end,
-		--     desc = "References",
-		--   },
-		--   {
-		--     "<leader>ls",
-		--     function() require("mini.pick").builtin.lsp_symbols() end,
-		--     desc = "Document Symbols",
-		--   },
-		--   {
-		--     "<leader>lS",
-		--     function() require("mini.pick").builtin.lsp_workspace_symbols() end,
-		--     desc = "Workspace Symbols",
-		--   },
-		--
-		--   -- Help
-		--   {
-		--     "<leader>ph",
-		--     function() require("mini.pick").builtin.help() end,
-		--     desc = "Help",
-		--   },
-		-- },
-
 		config = function()
 			require("mini.surround").setup()
 			require("mini.pairs").setup()
-			require("mini.bracketed").setup()
 			require("mini.trailspace").setup()
-			-- require("mini.pick").setup()
+			require("mini.bracketed").setup()
+			require("mini.indentscope").setup({
+				draw = {
+					delay = 0,
+					animation = function()
+						return 0
+					end, -- This effectively kills the animation
+				},
+				options = {
+					-- This makes the scope "smart" about where your cursor is
+					indent_at_cursor = true,
+					-- Try to locate scope even if cursor is on the border (if/then/end)
+					try_as_border = true,
+				},
+			})
 		end,
 	},
 
-	-- Mini Icons (optional)
+	-- Mini Icons
 	{
 		"echasnovski/mini.icons",
+		version = false,
 		lazy = true,
+		config = function()
+			require("mini.icons").setup()
+		end,
 	},
 
-	-- Mini Diff (Git signs)
+	-- Mini Diff
 	{
 		"echasnovski/mini.diff",
 		version = false,
@@ -110,24 +45,19 @@ return {
 			diff.setup({
 				view = {
 					style = "sign",
-					signs = {
-						add = "┃",
-						change = "┃",
-						delete = "▁",
-					},
+					signs = { add = "┃", change = "┃", delete = "▁" },
 				},
 			})
 
-			-- Hunk navigation
-			vim.keymap.set("n", "]h", function()
+			-- Keymaps
+			local map = vim.keymap.set
+			map("n", "]h", function()
 				diff.goto_hunk("next")
 			end, { desc = "Next Hunk" })
-
-			vim.keymap.set("n", "[h", function()
+			map("n", "[h", function()
 				diff.goto_hunk("prev")
 			end, { desc = "Prev Hunk" })
-
-			vim.keymap.set("n", "<leader>gp", function()
+			map("n", "<leader>gp", function()
 				diff.show_hunks()
 			end, { desc = "Preview Hunk" })
 		end,
