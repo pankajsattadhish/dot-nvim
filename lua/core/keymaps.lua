@@ -144,3 +144,4 @@ end
 map({ "n", "t" }, "<C-/>", toggle_terminal_horizontal, { desc = "Toggle Horizontal Terminal" })
 map({ "n", "t" }, "<C-_>", toggle_terminal_horizontal, { desc = "Toggle Horizontal Terminal" })
 map({ "n", "t" }, "<C-\\>", toggle_terminal_vertical, { desc = "Toggle Vertical Terminal" })
+

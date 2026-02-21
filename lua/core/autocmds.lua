@@ -86,3 +86,14 @@ api.nvim_create_autocmd({ "FocusGained", "BufEnter", "TermLeave" }, {
 		end
 	end,
 })
+
+vim.api.nvim_create_autocmd("VimEnter", {
+	group = vim.api.nvim_create_augroup("ProjectRoot", { clear = true }),
+	callback = function()
+		local markers = { ".git", "package.json" }
+		local root = vim.fs.find(markers, { upward = true })[1]
+		if root then
+			vim.cmd("cd " .. vim.fs.dirname(root))
+		end
+	end,
+})
