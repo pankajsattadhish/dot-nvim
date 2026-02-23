@@ -59,8 +59,8 @@ require("vague").setup({ transparent = true })
 vim.cmd("colorscheme vague")
 
 -- full transparency
-vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+-- vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+-- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 
 -- treesitter
 require("nvim-treesitter.config").setup({
@@ -281,7 +281,6 @@ require("oil").setup({
 		end,
 	},
 })
-
 vim.keymap.set("n", "-", "<cmd>Oil --float<cr>", { desc = "Open Oil Float" })
 
 -- Undotree
