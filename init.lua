@@ -85,6 +85,18 @@ end, "Toggle diagnostics (On/Off)")
 -- replace word under cursor
 map("n", "<leader>*", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], "Replace word under cursor")
 
+-- tmux-sessionizer
+map("n", "<C-f>", function()
+	local in_tmux = os.getenv("TMUX") ~= nil
+	if in_tmux then
+		vim.cmd("silent !tmux neww ~/.config/scripts/tmux-sessionizer.sh")
+	else
+		vim.cmd("enew") -- Open a small horizontal split
+		vim.cmd("term ~/.config/scripts/tmux-sessionizer.sh")
+		vim.cmd("startinsert")
+	end
+end, "Tmux Sessionizer")
+
 ------- Autocmds
 
 local aug = vim.api.nvim_create_augroup("UserConfig", { clear = true })
