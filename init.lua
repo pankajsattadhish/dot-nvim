@@ -37,6 +37,8 @@ vim.g.netrw_banner = 0
 
 vim.opt.linebreak = true
 
+vim.opt.termguicolors = true
+
 ------- keymaps
 
 local function map(mode, lhs, rhs, desc)
@@ -86,16 +88,26 @@ end, "Toggle diagnostics (On/Off)")
 map("n", "<leader>*", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], "Replace word under cursor")
 
 -- tmux-sessionizer
-map("n", "<C-f>", function()
-	local in_tmux = os.getenv("TMUX") ~= nil
-	if in_tmux then
-		vim.cmd("silent !tmux neww ~/.config/scripts/tmux-sessionizer.sh")
+vim.keymap.set("n", "<C-f>", function()
+	local script = vim.fn.expand("~/.config/scripts/tmux-sessionizer.sh")
+
+	if os.getenv("TMUX") ~= nil then
+		vim.fn.jobstart({ "tmux", "display-popup", "-E", "-w", "80%", "-h", "80%", script })
 	else
-		vim.cmd("enew") -- Open a small horizontal split
-		vim.cmd("term ~/.config/scripts/tmux-sessionizer.sh")
+		vim.cmd("enew")
+		local buf = vim.api.nvim_get_current_buf()
+
+		vim.fn.termopen(script)
 		vim.cmd("startinsert")
+
+		vim.api.nvim_create_autocmd("TermClose", {
+			buffer = buf,
+			callback = function()
+				vim.cmd("bdelete!")
+			end,
+		})
 	end
-end, "Tmux Sessionizer")
+end, { desc = "Tmux Sessionizer" })
 
 ------- Autocmds
 
