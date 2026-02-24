@@ -90,28 +90,6 @@ end, "Toggle diagnostics (On/Off)")
 -- replace word under cursor
 map("n", "<leader>*", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], "Replace word under cursor")
 
--- tmux-sessionizer
-vim.keymap.set("n", "<C-f>", function()
-	local script = vim.fn.expand("~/.config/scripts/tmux-sessionizer.sh")
-
-	if os.getenv("TMUX") ~= nil then
-		vim.fn.jobstart({ "tmux", "display-popup", "-E", "-w", "80%", "-h", "80%", script })
-	else
-		vim.cmd("enew")
-		local buf = vim.api.nvim_get_current_buf()
-
-		vim.fn.termopen(script)
-		vim.cmd("startinsert")
-
-		vim.api.nvim_create_autocmd("TermClose", {
-			buffer = buf,
-			callback = function()
-				vim.cmd("bdelete!")
-			end,
-		})
-	end
-end, { desc = "Tmux Sessionizer" })
-
 ------- Autocmds
 
 local aug = vim.api.nvim_create_augroup("UserConfig", { clear = true })
