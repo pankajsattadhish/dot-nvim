@@ -45,8 +45,11 @@ local function map(mode, lhs, rhs, desc)
 	vim.keymap.set(mode, lhs, rhs, { silent = true, desc = desc })
 end
 
+-- remove highlighting
+map("n", "<Esc>", "<cmd>noh<CR><Esc>", "Remove Highlight")
+
 -- similar to vscode's alt+arrow
-map("v", "J", ":m '>+1<CR>gv=gv", "Move selection down")
+map("v", "J", ":m '>+1<CR>gv=gv", "Move selectin down")
 map("v", "K", ":m '<-2<CR>gv=gv", "Move selection up")
 
 -- keeps it centered
