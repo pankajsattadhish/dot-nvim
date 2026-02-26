@@ -4,36 +4,29 @@ vim.opt.rtp:prepend(vim.fn.stdpath("config") .. "/lua")
 -- plugin list
 vim.pack.add({
 
-	-- ui / theme
 	{ src = "https://github.com/vague-theme/vague.nvim", name = "vague" },
 	{ src = "https://github.com/nvim-mini/mini.nvim", name = "mini" },
 
-	-- treesitter
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter", name = "nvim-treesitter" },
 
-	-- LSP layer
 	{ src = "https://github.com/neovim/nvim-lspconfig", name = "lspconfig" },
 	{ src = "https://github.com/mason-org/mason.nvim", name = "mason" },
 	{ src = "https://github.com/mason-org/mason-lspconfig.nvim", name = "mason-lspconfig" },
+	{ src = "https://github.com/stevearc/conform.nvim", name = "conform" },
 
-	-- completion
 	{ src = "https://github.com/saghen/blink.cmp", name = "blink.cmp" },
-	{ src = "https://github.com/L3MON4D3/LuaSnip", name = "luasnip" },
 	{ src = "https://github.com/rafamadriz/friendly-snippets", name = "friendly-snippets" },
 
-	-- telescope & utilities
+	{ src = "https://github.com/tpope/vim-fugitive", name = "vim-fugitive" },
+	{ src = "https://github.com/ThePrimeagen/harpoon", name = "harpoon", version = "harpoon2" },
+	-- { src = "https://github.com/ThePrimeagen/harpoon", name = "harpoon", branch = "harpoon3" },
+
 	{ src = "https://github.com/nvim-telescope/telescope.nvim", name = "telescope" },
 	{ src = "https://github.com/nvim-lua/plenary.nvim", name = "plenary" },
 	{ src = "https://github.com/nvim-telescope/telescope-fzf-native.nvim", name = "telescope-fzf-native" },
 
-	-- formatting
-	{ src = "https://github.com/stevearc/conform.nvim", name = "conform" },
-
-	-- file navigation
 	{ src = "https://github.com/stevearc/oil.nvim", name = "oil" },
 
-	-- editing helpers
-	{ src = "https://github.com/tpope/vim-sleuth", name = "vim-sleuth" },
 	{ src = "https://github.com/mbbill/undotree", name = "undotree" },
 })
 
@@ -43,7 +36,6 @@ vim.cmd.packloadall()
 require("mini.icons").setup()
 require("mini.icons").mock_nvim_web_devicons() --mock devicons (for Telescope)
 require("mini.surround").setup()
-require("mini.pairs").setup()
 require("mini.indentscope").setup({
 	draw = {
 		delay = 0,
@@ -55,12 +47,13 @@ require("mini.indentscope").setup({
 })
 
 -- theme
-require("vague").setup({ transparent = true })
+-- require("vague").setup({ transparent = true }) -- makes the statusline transparent too
+require("vague").setup()
 vim.cmd("colorscheme vague")
 
 -- full transparency
--- vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
--- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 
 -- treesitter
 require("nvim-treesitter.config").setup({
@@ -86,7 +79,6 @@ require("nvim-treesitter.config").setup({
 
 -- completion
 require("blink.cmp").setup({
-	snippets = { preset = "luasnip" },
 	keymap = {
 		["<C-space>"] = { "show", "hide" },
 		["<CR>"] = { "accept", "fallback" },
@@ -100,12 +92,9 @@ require("blink.cmp").setup({
 			window = { border = "rounded" },
 		},
 	},
+
 	signature = { enabled = true, window = { border = "rounded" } },
 })
-
--- luasnip
-require("luasnip").config.set_config({})
-require("luasnip.loaders.from_vscode").lazy_load()
 
 -- telescope
 local ig = {
@@ -269,7 +258,8 @@ require("oil").setup({
 		enabled = true,
 		autosave_changes = true,
 	},
-	view_options = { show_hidden = true },
+	view_options = { show_hidden = true, natural_order = true },
+	win_options = { wrap = true },
 	float = {
 		padding = 2,
 		max_width = 35,
@@ -287,9 +277,71 @@ vim.keymap.set("n", "-", "<cmd>Oil --float<cr>", { desc = "Open Oil Float" })
 vim.keymap.set("n", "<leader>u", "<cmd>UndotreeToggle<cr>", { desc = "Undo Tree" })
 
 -- Mason (package manager for LSP/formatters/linters)
-require("mason").setup({
-	ui = {
-		border = "rounded",
+require("mason").setup({ ui = { border = "rounded" }, log_level = vim.log.levels.INFO })
+
+-- Harpoon
+local harpoon = require("harpoon")
+harpoon:setup()
+
+-- Basic Keymaps
+vim.keymap.set("n", "<leader>ha", function()
+	harpoon:list():add()
+end, { desc = "Harpoon Add" })
+vim.keymap.set("n", "<C-e>", function()
+	harpoon.ui:toggle_quick_menu(harpoon:list())
+end, { desc = "Harpoon Menu" })
+
+vim.keymap.set("n", "<C-h>", function()
+	harpoon:list():select(1)
+end)
+vim.keymap.set("n", "<C-j>", function()
+	harpoon:list():select(2)
+end)
+vim.keymap.set("n", "<C-k>", function()
+	harpoon:list():select(3)
+end)
+vim.keymap.set("n", "<C-l>", function()
+	harpoon:list():select(4)
+end)
+
+-- mini.diff setup (vISUALS & hUNK aCTIONS)
+local MiniDiff = require("mini.diff")
+MiniDiff.setup({
+	-- Use signs in the gutter (minimalist approach)
+	view = {
+		style = "sign",
+		signs = { add = "▎", change = "▎", delete = "" },
 	},
-	log_level = vim.log.levels.INFO,
 })
+
+-- Hunk Navigation (]h and [h)
+vim.keymap.set("n", "]h", function()
+	MiniDiff.goto_hunk("next")
+end, { desc = "Next Hunk" })
+vim.keymap.set("n", "[h", function()
+	MiniDiff.goto_hunk("prev")
+end, { desc = "Prev Hunk" })
+
+-- Hunk Actions (Stage and Reset)
+-- 'Apply' in mini.diff = 'Stage' in Git
+vim.keymap.set("n", "<leader>hs", function()
+	MiniDiff.operator("apply")
+end, { desc = "Stage Hunk" })
+vim.keymap.set("n", "<leader>hr", function()
+	MiniDiff.operator("reset")
+end, { desc = "Reset Hunk" })
+-- Visual mode support (select lines then stage/reset)
+vim.keymap.set("x", "<leader>hs", ':MiniDiff.operator("apply")<CR>', { desc = "Stage Selection" })
+vim.keymap.set("x", "<leader>hr", ':MiniDiff.operator("reset")<CR>', { desc = "Reset Selection" })
+
+-- Overlay Toggle (See exactly what was deleted/changed inline)
+vim.keymap.set("n", "<leader>hv", MiniDiff.toggle_overlay, { desc = "Toggle Hunk View" })
+
+-- fugitive setup (the powerhouse)
+-- Fugitive doesn't need a .setup() call, just mappings
+vim.keymap.set("n", "<leader>gs", vim.cmd.Git, { desc = "Git Status" })
+vim.keymap.set("n", "<leader>gb", ":G blame<CR>", { desc = "Git Blame" })
+vim.keymap.set("n", "<leader>gd", ":Gvdiffsplit<CR>", { desc = "Git Diff Split" })
+-- Push and Pull
+vim.keymap.set("n", "<leader>gp", ":Git push<CR>", { desc = "Git Push" })
+vim.keymap.set("n", "<leader>gP", ":Git pull<CR>", { desc = "Git Pull" })
