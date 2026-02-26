@@ -39,6 +39,13 @@ vim.opt.linebreak = true
 
 vim.opt.termguicolors = true
 
+vim.opt.timeoutlen = 1000 -- Sets wait time to 1 seconds
+
+if vim.fn.executable("rg") == 1 then
+	vim.opt.grepprg = "rg --vimgrep --smart-case"
+	vim.opt.grepformat = "%f:%l:%c:%m"
+end
+
 ------- keymaps
 
 local function map(mode, lhs, rhs, desc)
@@ -76,6 +83,7 @@ map("t", "<C-w>", "<C-\\><C-n><C-w>", "Terminal window navigation")
 map("n", "<leader>e", "<cmd>25Lexplore<cr>", "Toggle Netrw")
 map("n", "<leader>w", vim.cmd.write, "Save file")
 map("n", "<leader>q", vim.cmd.quit, "Quit Neovim")
+map("n", "<leader>r", vim.cmd.restart, "Restart Neovim")
 
 -- diagnostics toggles
 map("n", "<leader>dv", function()
@@ -85,12 +93,9 @@ end, "Toggle diagnostic virtual text")
 
 map("n", "<leader>dt", function()
 	vim.diagnostic.enable(not vim.diagnostic.is_enabled())
-end, "Toggle diagnostics (On/Off)")
+end, "Toggle diagnostics")
 
--- replace word under cursor
-map("n", "<leader>*", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], "Replace word under cursor")
-
-------- Autocmds
+-------------------- Autocmds
 
 local aug = vim.api.nvim_create_augroup("UserConfig", { clear = true })
 
@@ -137,7 +142,7 @@ vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "TermLeave" }, {
 
 -- Quit using q
 vim.api.nvim_create_autocmd("FileType", {
-	group = augroup,
+	group = aug,
 	desc = "Enable 'q' to close temporary/utility windows",
 	pattern = { "help", "qf", "man", "lspinfo", "checkhealth", "oil", "query" },
 	callback = function(ev)
