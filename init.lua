@@ -3,6 +3,7 @@ vim.g.have_nerd_font = true
 
 vim.opt.mouse = "a"
 vim.opt.undofile = true
+vim.opt.autoread = true
 vim.opt.timeoutlen = 300
 vim.opt.updatetime = 300
 
@@ -39,7 +40,7 @@ vim.opt.linebreak = true
 
 vim.opt.termguicolors = true
 
-vim.opt.timeoutlen = 1000 -- Sets wait time to 1 seconds
+vim.opt.timeoutlen = 1000 -- sets wait time to 1 seconds
 
 if vim.fn.executable("rg") == 1 then
 	vim.opt.grepprg = "rg --vimgrep --smart-case"
@@ -95,11 +96,11 @@ map("n", "<leader>dt", function()
 	vim.diagnostic.enable(not vim.diagnostic.is_enabled())
 end, "Toggle diagnostics")
 
--------------------- Autocmds
+-------------------- autocmds
 
 local aug = vim.api.nvim_create_augroup("UserConfig", { clear = true })
 
--- Highlight on yank
+-- highlight on yank
 vim.api.nvim_create_autocmd("TextYankPost", {
 	group = aug,
 	callback = function()
@@ -107,7 +108,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 	end,
 })
 
--- No comment continuation
+-- no comment continuation
 vim.api.nvim_create_autocmd("BufEnter", {
 	group = aug,
 	callback = function()
@@ -115,7 +116,7 @@ vim.api.nvim_create_autocmd("BufEnter", {
 	end,
 })
 
--- Restore cursor position
+-- restore cursor position
 vim.api.nvim_create_autocmd("BufReadPost", {
 	group = aug,
 	callback = function()
@@ -130,7 +131,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 	end,
 })
 
--- Auto-reload external changes
+-- auto-reload external changes
 vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "TermLeave" }, {
 	group = aug,
 	callback = function()
@@ -140,7 +141,7 @@ vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "TermLeave" }, {
 	end,
 })
 
--- Quit using q
+-- quit using q
 vim.api.nvim_create_autocmd("FileType", {
 	group = aug,
 	desc = "Enable 'q' to close temporary/utility windows",
@@ -151,7 +152,7 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
--- Format on save
+-- format on save
 vim.api.nvim_create_autocmd("BufWritePre", {
 	group = aug,
 	callback = function(args)
@@ -159,6 +160,54 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 	end,
 })
 
--- Load files
+-- gf for obsidian files
+local function obsidian_gf()
+	local line = vim.api.nvim_get_current_line()
+	local col = vim.api.nvim_win_get_cursor(0)[2] + 1 -- Lua is 1-indexed
+
+	local _, start_pos = line:sub(1, col):find(".*%[%[")
+	local end_pos = line:find("%]%]", col)
+
+	if start_pos and end_pos then
+		local note_content = line:sub(start_pos + 1, end_pos - 1)
+		local note_name = note_content:gsub("%.md$", ""):gsub("#.*", "")
+
+		note_name = vim.trim(note_name)
+
+		local vault_path = vim.fn.expand("~/library/vaults/personal")
+		local find_cmd = string.format('find "%s" -iname "%s.md" -print -quit', vault_path, note_name)
+		local target_file = vim.fn.system(find_cmd):gsub("\n", "")
+
+		if target_file ~= "" then
+			vim.cmd("edit " .. vim.fn.fnameescape(target_file))
+		else
+			vim.ui.input({ prompt = "Note not found. Create '" .. note_name .. ".md'? (y/n): " }, function(input)
+				if input and input:lower() == "y" then
+					local new_file = vault_path .. "/01_Notes/" .. note_name .. ".md"
+					vim.cmd("edit " .. vim.fn.fnameescape(new_file))
+					vim.api.nvim_buf_set_lines(0, 0, 0, false, { "# " .. note_name, "" })
+				end
+			end)
+		end
+	else
+		-- Fallback for standard files/URLs
+		local ok = pcall(vim.cmd, "normal! gf")
+		if not ok then
+			print("No wiki-link or file under cursor")
+		end
+	end
+end
+
+-- Keymaps for obsidian_gf
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "markdown",
+	callback = function()
+		vim.keymap.set("n", "gf", obsidian_gf, { buffer = true, desc = "Follow Obsidian Link" })
+	end,
+})
+
+-- load files
 require("plugins")
 require("lsp")
+require("floaterminal")
+require("scratchpad")
