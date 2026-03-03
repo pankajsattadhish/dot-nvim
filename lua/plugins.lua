@@ -7,56 +7,65 @@ vim.pack.add({
 	{ src = "https://github.com/vague-theme/vague.nvim", name = "vague" },
 	{ src = "https://github.com/nvim-mini/mini.nvim", name = "mini" },
 
+	-- lsp, treesitter & formatting
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter", name = "nvim-treesitter" },
-
 	{ src = "https://github.com/neovim/nvim-lspconfig", name = "lspconfig" },
 	{ src = "https://github.com/mason-org/mason.nvim", name = "mason" },
 	{ src = "https://github.com/mason-org/mason-lspconfig.nvim", name = "mason-lspconfig" },
 	{ src = "https://github.com/stevearc/conform.nvim", name = "conform" },
 
+	-- autocompletion
 	{ src = "https://github.com/saghen/blink.cmp", name = "blink.cmp" },
 	{ src = "https://github.com/rafamadriz/friendly-snippets", name = "friendly-snippets" },
 
-	{ src = "https://github.com/tpope/vim-fugitive", name = "vim-fugitive" },
-	{ src = "https://github.com/ThePrimeagen/harpoon", name = "harpoon", version = "harpoon2" },
-	-- { src = "https://github.com/ThePrimeagen/harpoon", name = "harpoon", branch = "harpoon3" },
-
+	--  navigation
 	{ src = "https://github.com/nvim-telescope/telescope.nvim", name = "telescope" },
 	{ src = "https://github.com/nvim-lua/plenary.nvim", name = "plenary" },
 	{ src = "https://github.com/nvim-telescope/telescope-fzf-native.nvim", name = "telescope-fzf-native" },
-
 	{ src = "https://github.com/stevearc/oil.nvim", name = "oil" },
-
 	{ src = "https://github.com/mbbill/undotree", name = "undotree" },
+	{ src = "https://github.com/tpope/vim-fugitive", name = "vim-fugitive" },
+	{
+		src = "https://github.com/ThePrimeagen/harpoon",
+		name = "harpoon",
+		branch = "harpoon3",
+	},
+
+	-- ai
+	{ src = "https://github.com/sudo-tee/opencode.nvim", name = "opencode.nvim" },
+	{ src = "https://github.com/MeanderingProgrammer/render-markdown.nvim", name = "render-markdown" },
 })
 
--- ensure all plugins are loaded
-vim.cmd.packloadall()
+vim.cmd.packloadall() -- ensure all plugins are loaded
 
 require("mini.icons").setup()
 require("mini.icons").mock_nvim_web_devicons() --mock devicons (for Telescope)
 require("mini.surround").setup()
-require("mini.indentscope").setup({
-	draw = {
-		delay = 0,
-		animation = function()
-			return 0
-		end,
-	},
-	options = { indent_at_cursor = true, try_as_border = true },
-})
+require("mini.pairs").setup()
+-- require("mini.indentscope").setup({
+-- 	draw = {
+-- 		delay = 0,
+-- 		animation = function()
+-- 			return 0
+-- 		end,
+-- 	},
+-- 	options = { indent_at_cursor = true, try_as_border = true },
+-- })
 
 -- theme
--- require("vague").setup({ transparent = true }) -- makes the statusline transparent too
-require("vague").setup()
+require("vague").setup({
+	transparent = true,
+})
+
 vim.cmd("colorscheme vague")
 
 -- full transparency
-vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+-- vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+-- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+-- vim.api.nvim_set_hl(0, "StatusLine", { bg = "none" })
 
 -- treesitter
-require("nvim-treesitter.config").setup({
+require("nvim-treesitter").setup({
 	ensure_installed = {
 		"bash",
 		"c",
@@ -73,12 +82,16 @@ require("nvim-treesitter.config").setup({
 		"vim",
 		"yaml",
 	},
+	sync_install = true,
 	highlight = { enable = true },
-	indent = { enable = false },
+	indent = { enable = true },
 })
 
 -- completion
 require("blink.cmp").setup({
+	fuzzy = {
+		implementation = "lua",
+	},
 	keymap = {
 		["<C-space>"] = { "show", "hide" },
 		["<CR>"] = { "accept", "fallback" },
@@ -87,12 +100,8 @@ require("blink.cmp").setup({
 	},
 	completion = {
 		menu = { border = "rounded" },
-		documentation = {
-			auto_show = true,
-			window = { border = "rounded" },
-		},
+		documentation = { auto_show = true, window = { border = "rounded" } },
 	},
-
 	signature = { enabled = true, window = { border = "rounded" } },
 })
 
@@ -138,7 +147,7 @@ require("telescope").setup({
 			"dist/",
 			"build/",
 			".next/",
-			"coverage/",
+			coverage = "coverage/",
 			"%.lock",
 			"package%-lock.json",
 			"yarn.lock",
@@ -158,7 +167,7 @@ require("telescope").setup({
 
 pcall(require("telescope").load_extension, "fzf")
 
--- Telescope keymaps
+-- telescope keymaps
 local function tmap(lhs, fn, desc)
 	vim.keymap.set("n", lhs, fn, { desc = desc })
 end
@@ -229,7 +238,7 @@ require("conform").setup({
 		javascriptreact = { "prettier" },
 		typescriptreact = { "prettier" },
 		json = { "prettier" },
-		yaml = { "prettier" },
+		yaml = { "prettier", "yamlfmt" },
 		html = { "prettier" },
 		css = { "prettier" },
 		markdown = { "prettier" },
@@ -237,19 +246,18 @@ require("conform").setup({
 		rust = { "rustfmt" },
 		bash = { "shfmt" },
 		sh = { "shfmt" },
-		go = { "goimports", "gofmt" },
-		java = { "google_java_format" },
+		go = { "gofmt", "goimports" },
+		java = { "google-java-format" },
 		cpp = { "clang_format" },
 		c = { "clang_format" },
 	},
-	default_format_opts = {
-		lsp_format = "fallback",
+	format_on_save = {
+		timeout_ms = 500,
+		lsp_fallback = true,
 	},
 })
 
-vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
-
--- Oil.nvim
+-- oil.nvim
 require("oil").setup({
 	default_file_explorer = false, -- you want netrw too
 	delete_to_trash = true,
@@ -273,17 +281,17 @@ require("oil").setup({
 })
 vim.keymap.set("n", "-", "<cmd>Oil --float<cr>", { desc = "Open Oil Float" })
 
--- Undotree
+-- undotree
 vim.keymap.set("n", "<leader>u", "<cmd>UndotreeToggle<cr>", { desc = "Undo Tree" })
 
--- Mason (package manager for LSP/formatters/linters)
+-- mason (package manager for lsp/formatters/linters)
 require("mason").setup({ ui = { border = "rounded" }, log_level = vim.log.levels.INFO })
 
--- Harpoon
+-- harpoon
 local harpoon = require("harpoon")
 harpoon:setup()
 
--- Basic Keymaps
+-- basic keymaps for harpoon
 vim.keymap.set("n", "<leader>ha", function()
 	harpoon:list():add()
 end, { desc = "Harpoon Add" })
@@ -304,17 +312,17 @@ vim.keymap.set("n", "<C-l>", function()
 	harpoon:list():select(4)
 end)
 
--- mini.diff setup (vISUALS & hUNK aCTIONS)
+-- mini.diff setup (visuals & hunk actions)
 local MiniDiff = require("mini.diff")
 MiniDiff.setup({
-	-- Use signs in the gutter (minimalist approach)
+	-- use signs in the gutter (minimalist approach)
 	view = {
 		style = "sign",
 		signs = { add = "▎", change = "▎", delete = "" },
 	},
 })
 
--- Hunk Navigation (]h and [h)
+-- hunk navigation (]h and [h)
 vim.keymap.set("n", "]h", function()
 	MiniDiff.goto_hunk("next")
 end, { desc = "Next Hunk" })
@@ -322,26 +330,56 @@ vim.keymap.set("n", "[h", function()
 	MiniDiff.goto_hunk("prev")
 end, { desc = "Prev Hunk" })
 
--- Hunk Actions (Stage and Reset)
--- 'Apply' in mini.diff = 'Stage' in Git
+-- hunk actions (stage and reset)
 vim.keymap.set("n", "<leader>hs", function()
 	MiniDiff.operator("apply")
 end, { desc = "Stage Hunk" })
 vim.keymap.set("n", "<leader>hr", function()
 	MiniDiff.operator("reset")
 end, { desc = "Reset Hunk" })
--- Visual mode support (select lines then stage/reset)
+-- visual mode support (select lines then stage/reset)
 vim.keymap.set("x", "<leader>hs", ':MiniDiff.operator("apply")<CR>', { desc = "Stage Selection" })
 vim.keymap.set("x", "<leader>hr", ':MiniDiff.operator("reset")<CR>', { desc = "Reset Selection" })
 
--- Overlay Toggle (See exactly what was deleted/changed inline)
+-- overlay toggle (see exactly what was deleted/changed inline)
 vim.keymap.set("n", "<leader>hv", MiniDiff.toggle_overlay, { desc = "Toggle Hunk View" })
 
--- fugitive setup (the powerhouse)
--- Fugitive doesn't need a .setup() call, just mappings
+-- fugitive setup
+-- fugitive doesn't need a .setup() call, just mappings
 vim.keymap.set("n", "<leader>gs", vim.cmd.Git, { desc = "Git Status" })
 vim.keymap.set("n", "<leader>gb", ":G blame<CR>", { desc = "Git Blame" })
 vim.keymap.set("n", "<leader>gd", ":Gvdiffsplit<CR>", { desc = "Git Diff Split" })
--- Push and Pull
+-- push and pull
 vim.keymap.set("n", "<leader>gp", ":Git push<CR>", { desc = "Git Push" })
 vim.keymap.set("n", "<leader>gP", ":Git pull<CR>", { desc = "Git Pull" })
+
+-- opencode.nvim
+
+-- Default configuration with all available options
+require("opencode").setup({
+	preferred_picker = "telescope",
+	preferred_completion = "blink",
+	default_global_keymaps = true,
+	default_mode = "build",
+	default_system_prompt = nil, -- Custom system prompt to use for all sessions. If nil, uses the default built-in system prompt
+	keymap_prefix = "<leader>o",
+	opencode_executable = "opencode",
+	keymap = {
+		editor = {
+			["<leader>og"] = { "toggle" },
+			["<leader>o/"] = { "quick_chat", mode = { "n", "x" } },
+			["<leader>op"] = { "add_visual_selection", mode = { "v" } },
+			["<leader>oz"] = { "toggle_zoom" },
+			["<leader>ov"] = { "paste_image" },
+			["<leader>od"] = { "diff_open" },
+			["<leader>o]"] = { "diff_next" },
+			["<leader>o["] = { "diff_prev" },
+			["<leader>oc"] = { "diff_close" },
+		},
+	},
+})
+-- render-markdown for opencode
+require("render-markdown").setup({
+	anti_conceal = { enabled = false },
+	file_types = { "markdown", "opencode_output" },
+})
