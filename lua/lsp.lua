@@ -5,7 +5,6 @@ local ok, blink = pcall(require, "blink.cmp")
 if ok and blink.get_lsp_capabilities then
 	capabilities = vim.tbl_deep_extend("force", capabilities, blink.get_lsp_capabilities())
 end
-capabilities.textDocument.documentHighlight = true
 M.capabilities = capabilities
 
 require("mason-lspconfig").setup({
@@ -67,24 +66,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		map("<C-s>", function()
 			vim.lsp.buf.signature_help({ border = "rounded", max_height = 30, max_width = 100 })
 		end, "Signature Help")
-
-		if client.server_capabilities.documentHighlightProvider then
-			vim.api.nvim_create_augroup("lsp_document_highlight", { clear = false })
-			vim.api.nvim_clear_autocmds({
-				buffer = buf,
-				group = "lsp_document_highlight",
-			})
-			vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-				group = "lsp_document_highlight",
-				buffer = buf,
-				callback = vim.lsp.buf.document_highlight,
-			})
-			vim.api.nvim_create_autocmd("CursorMoved", {
-				group = "lsp_document_highlight",
-				buffer = buf,
-				callback = vim.lsp.buf.clear_references,
-			})
-		end
 	end,
 })
 
@@ -95,9 +76,5 @@ vim.diagnostic.config({
 	update_in_insert = false,
 	float = { border = "rounded", max_width = 80 },
 })
-
-vim.api.nvim_set_hl(0, "LspDocumentHighlight", { link = "Visual" })
-vim.api.nvim_set_hl(0, "LspDocumentHighlightRead", { link = "Visual" })
-vim.api.nvim_set_hl(0, "LspDocumentHighlightWrite", { link = "Visual" })
 
 return M
