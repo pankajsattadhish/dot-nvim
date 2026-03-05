@@ -42,6 +42,7 @@ require("mini.icons").setup()
 require("mini.icons").mock_nvim_web_devicons() --mock devicons (for Telescope)
 require("mini.surround").setup()
 require("mini.pairs").setup()
+-- require("mini.statusline").setup()
 -- require("mini.indentscope").setup({
 -- 	draw = {
 -- 		delay = 0,
@@ -257,6 +258,11 @@ require("conform").setup({
 	},
 })
 
+-- manual format keybinding
+vim.keymap.set("n", "<leader>fc", function()
+	require("conform").format({ async = true, timeout_ms = 500 })
+end, { desc = "Format Code" })
+
 -- oil.nvim
 require("oil").setup({
 	default_file_explorer = false, -- you want netrw too
@@ -378,8 +384,12 @@ require("opencode").setup({
 		},
 	},
 })
--- render-markdown for opencode
+
 require("render-markdown").setup({
-	anti_conceal = { enabled = false },
-	file_types = { "markdown", "opencode_output" },
+	completions = { lsp = { enabled = true } },
+	opts = {
+		anti_conceal = { enabled = false },
+		file_types = { "markdown", "opencode_output" },
+	},
+	ft = { "markdown", "Avante", "copilot-chat", "opencode_output" },
 })
