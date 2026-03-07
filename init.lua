@@ -4,8 +4,9 @@ vim.g.have_nerd_font = true
 vim.opt.mouse = "a"
 vim.opt.undofile = true
 vim.opt.autoread = true
-vim.opt.timeoutlen = 300
+vim.opt.timeoutlen = 1000 -- sets wait time to 1 seconds
 vim.opt.updatetime = 300
+vim.opt.smoothscroll = true
 
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
@@ -19,6 +20,7 @@ vim.opt.signcolumn = "yes"
 vim.opt.cursorline = true
 vim.opt.colorcolumn = "80"
 vim.opt.scrolloff = 8
+vim.opt.linebreak = true
 vim.opt.wrap = false
 
 vim.opt.pumheight = 10
@@ -36,18 +38,14 @@ vim.opt.laststatus = 3
 vim.g.netrw_liststyle = 3
 vim.g.netrw_banner = 0
 
-vim.opt.linebreak = true
-
 vim.opt.termguicolors = true
-
-vim.opt.timeoutlen = 1000 -- sets wait time to 1 seconds
 
 if vim.fn.executable("rg") == 1 then
 	vim.opt.grepprg = "rg --vimgrep --smart-case"
 	vim.opt.grepformat = "%f:%l:%c:%m"
 end
 
-------- keymaps
+---------------- keymaps
 
 local function map(mode, lhs, rhs, desc)
 	vim.keymap.set(mode, lhs, rhs, { silent = true, desc = desc })
@@ -163,56 +161,10 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 	end,
 })
 
--- gf for obsidian files
-local function obsidian_gf()
-	local line = vim.api.nvim_get_current_line()
-	local col = vim.api.nvim_win_get_cursor(0)[2] + 1 -- Lua is 1-indexed
-
-	local _, start_pos = line:sub(1, col):find(".*%[%[")
-	local end_pos = line:find("%]%]", col)
-
-	if start_pos and end_pos then
-		local note_content = line:sub(start_pos + 1, end_pos - 1)
-		local note_name = note_content:gsub("%.md$", ""):gsub("#.*", "")
-
-		note_name = vim.trim(note_name)
-
-		local vault_path = vim.fn.expand("~/library/vaults/personal")
-		local find_cmd = string.format('find "%s" -iname "%s.md" -print -quit', vault_path, note_name)
-		local target_file = vim.fn.system(find_cmd):gsub("\n", "")
-
-		if target_file ~= "" then
-			vim.cmd("edit " .. vim.fn.fnameescape(target_file))
-		else
-			vim.ui.input({ prompt = "Note not found. Create '" .. note_name .. ".md'? (y/n): " }, function(input)
-				if input and input:lower() == "y" then
-					local new_file = vault_path .. "/01_Notes/" .. note_name .. ".md"
-					vim.cmd("edit " .. vim.fn.fnameescape(new_file))
-					vim.api.nvim_buf_set_lines(0, 0, 0, false, { "# " .. note_name, "" })
-				end
-			end)
-		end
-	else
-		-- Fallback for standard files/URLs
-		local ok = pcall(vim.cmd, "normal! gf")
-		if not ok then
-			print("No wiki-link or file under cursor")
-		end
-	end
-end
-
--- Keymaps for obsidian_gf
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = "markdown",
-	callback = function()
-		vim.keymap.set("n", "gf", obsidian_gf, { buffer = true, desc = "Follow Obsidian Link" })
-	end,
-})
-
 ---------------------- plugins
 
 -- runtime path adjustment
-vim.opt.rtp:prepend(vim.fn.stdpath("config") .. "/lua")
+-- vim.opt.rtp:prepend(vim.fn.stdpath("config") .. "/lua")
 
 -- plugin list
 vim.pack.add({
@@ -233,8 +185,8 @@ vim.pack.add({
 
 	--  navigation
 	{ src = "https://github.com/nvim-telescope/telescope.nvim", name = "telescope" },
-	{ src = "https://github.com/nvim-lua/plenary.nvim", name = "plenary" },
 	{ src = "https://github.com/nvim-telescope/telescope-fzf-native.nvim", name = "telescope-fzf-native" },
+	{ src = "https://github.com/nvim-lua/plenary.nvim", name = "plenary" },
 	{ src = "https://github.com/stevearc/oil.nvim", name = "oil" },
 	{ src = "https://github.com/mbbill/undotree", name = "undotree" },
 	{ src = "https://github.com/tpope/vim-fugitive", name = "vim-fugitive" },
@@ -671,7 +623,3 @@ vim.diagnostic.config({
 	update_in_insert = false,
 	float = { border = "rounded", max_width = 80 },
 })
-
--- load files
-require("floaterm")
-require("scratchpad")
