@@ -1,49 +1,24 @@
 vim.g.mapleader = " "
-vim.g.have_nerd_font = true
-
 vim.opt.mouse = "a"
 vim.opt.undofile = true
+vim.opt.swapfile = true
 vim.opt.autoread = true
-vim.opt.timeoutlen = 1000 -- sets wait time to 1 seconds
-vim.opt.updatetime = 300
-vim.opt.smoothscroll = true
-
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
-vim.opt.inccommand = "split"
-
-vim.opt.showmatch = true
-
 vim.opt.number = true
 vim.opt.relativenumber = true
-vim.opt.signcolumn = "yes"
-vim.opt.cursorline = true
-vim.opt.colorcolumn = "80"
-vim.opt.scrolloff = 8
-vim.opt.linebreak = true
+vim.opt.signcolumn = "yes:2"
 vim.opt.wrap = false
-
-vim.opt.pumheight = 10
-vim.opt.pumblend = 10
-vim.opt.winblend = 0
-
+vim.opt.termguicolors = true
+vim.opt.laststatus = 3
 vim.opt.tabstop = 2
 vim.opt.expandtab = true
 vim.opt.shiftwidth = 2
-
-vim.opt.splitbelow = true
-vim.opt.splitright = true
-
-vim.opt.laststatus = 3
 vim.g.netrw_liststyle = 3
 vim.g.netrw_banner = 0
-
-vim.opt.termguicolors = true
-
-if vim.fn.executable("rg") == 1 then
-	vim.opt.grepprg = "rg --vimgrep --smart-case"
-	vim.opt.grepformat = "%f:%l:%c:%m"
-end
+vim.opt.splitbelow = true
+vim.opt.splitright = true
+vim.opt.completeopt = { "menuone", "popup", "noinsert" }
 
 ---------------- keymaps
 
@@ -51,51 +26,38 @@ local function map(mode, lhs, rhs, desc)
 	vim.keymap.set(mode, lhs, rhs, { silent = true, desc = desc })
 end
 
--- better escape
-map("i", "jk", "<Esc>", "Exit from insert mode")
-
--- remove highlighting
-map("n", "<Esc>", "<cmd>noh<CR><Esc>", "Remove Highlight")
-
--- similar to vscode's alt+arrow
 map("v", "J", ":m '>+1<CR>gv=gv", "Move selectin down")
 map("v", "K", ":m '<-2<CR>gv=gv", "Move selection up")
-
--- keeps it centered
+map("v", "<", "<gv", "Indent left (keep selection)")
+map("v", ">", ">gv", "Indent right (keep selection)")
+map("n", "<M-j>", "<cmd>resize +2<CR>")
+map("n", "<M-k>", "<cmd>resize -2<CR>")
+map("n", "<M-h>", "<cmd>vertical resize +5<CR>")
+map("n", "<M-l>", "<cmd>vertical resize -5<CR>")
 map("n", "G", "Gzz", "Go to end and center")
 map("n", "<C-d>", "<C-d>zz", "Scroll down and center")
 map("n", "<C-u>", "<C-u>zz", "Scroll up and center")
 map("n", "n", "nzzzv", "Next search result (centered)")
 map("n", "N", "Nzzzv", "Prev search result (centered)")
-
--- keep selection after indenting
-map("v", "<", "<gv", "Indent left (keep selection)")
-map("v", ">", ">gv", "Indent right (keep selection)")
-
--- smart yank and paste
 map({ "n", "v" }, "<leader>y", [["+y]], "Copy to system clipboard")
 map({ "n", "v" }, "<leader>p", [["+p]], "Paste from system clipboard")
 map({ "v", "x" }, "p", '"_dP', "Paste without overwriting register")
-
--- terminal esc
-map("t", "<Esc><Esc>", "<C-\\><C-n>", "Exit terminal mode")
-map("t", "<C-w>", "<C-\\><C-n><C-w>", "Terminal window navigation")
-
--- just for convenience
+map("t", "<Esc>", "<C-\\><C-n>", "Exit terminal mode")
+map("n", "<Esc>", "<cmd>noh<CR><Esc>", "Remove Highlight")
 map("n", "<leader>e", "<cmd>25Lexplore<cr>", "Toggle Netrw")
 map("n", "<leader>w", vim.cmd.write, "Save file")
 map("n", "<leader>q", vim.cmd.quit, "Quit Neovim")
 map("n", "<leader>r", vim.cmd.restart, "Restart Neovim")
-
--- diagnostics toggles
+map("n", "<C-q>", ":copen<CR>")
 map("n", "<leader>dv", function()
 	local current = vim.diagnostic.config().virtual_text
 	vim.diagnostic.config({ virtual_text = not current })
 end, "Toggle diagnostic virtual text")
-
 map("n", "<leader>dt", function()
 	vim.diagnostic.enable(not vim.diagnostic.is_enabled())
 end, "Toggle diagnostics")
+map({ "n", "t" }, "<Leader>t", "<Cmd>term<CR>i")
+map({ "n", "t" }, "<Leader>x", "<Cmd>tabclose<CR>")
 
 -------------------- autocmds
 
@@ -168,49 +130,35 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 
 -- plugin list
 vim.pack.add({
-
 	{ src = "https://github.com/vague-theme/vague.nvim", name = "vague" },
 	{ src = "https://github.com/nvim-mini/mini.nvim", name = "mini" },
-
-	-- lsp, treesitter & formatting
+	{ src = "https://github.com/chentoast/marks.nvim", name = "marks" },
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter", name = "nvim-treesitter" },
 	{ src = "https://github.com/neovim/nvim-lspconfig", name = "lspconfig" },
 	{ src = "https://github.com/mason-org/mason.nvim", name = "mason" },
 	{ src = "https://github.com/mason-org/mason-lspconfig.nvim", name = "mason-lspconfig" },
 	{ src = "https://github.com/stevearc/conform.nvim", name = "conform" },
-
-	-- autocompletion
 	{ src = "https://github.com/saghen/blink.cmp", name = "blink.cmp" },
 	{ src = "https://github.com/rafamadriz/friendly-snippets", name = "friendly-snippets" },
-
-	--  navigation
 	{ src = "https://github.com/nvim-telescope/telescope.nvim", name = "telescope" },
 	{ src = "https://github.com/nvim-telescope/telescope-fzf-native.nvim", name = "telescope-fzf-native" },
 	{ src = "https://github.com/nvim-lua/plenary.nvim", name = "plenary" },
-	{ src = "https://github.com/stevearc/oil.nvim", name = "oil" },
 	{ src = "https://github.com/mbbill/undotree", name = "undotree" },
+	{ src = "https://github.com/stevearc/oil.nvim", name = "oil" },
 	{ src = "https://github.com/tpope/vim-fugitive", name = "vim-fugitive" },
 	{
 		src = "https://github.com/ThePrimeagen/harpoon",
 		name = "harpoon",
 		branch = "harpoon3",
 	},
-
-	-- ai
 	{ src = "https://github.com/sudo-tee/opencode.nvim", name = "opencode.nvim" },
 	{ src = "https://github.com/MeanderingProgrammer/render-markdown.nvim", name = "render-markdown" },
 })
 
 vim.cmd.packloadall() -- ensure all plugins are loaded
 
-require("mini.icons").setup()
-require("mini.icons").mock_nvim_web_devicons() --mock devicons (for Telescope)
-require("mini.surround").setup()
-require("mini.pairs").setup()
-
--- theme
 require("vague").setup({
-	transparent = true,
+	transparent = false,
 })
 
 vim.cmd("colorscheme vague")
@@ -219,6 +167,18 @@ vim.cmd("colorscheme vague")
 -- vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 -- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 -- vim.api.nvim_set_hl(0, "StatusLine", { bg = "none" })
+
+require("mini.icons").setup()
+require("mini.icons").mock_nvim_web_devicons() --mock devicons (for Telescope)
+require("mini.surround").setup()
+require("mini.pairs").setup()
+
+-- marks
+require("marks").setup({
+	default_mappings = true,
+	signs = true,
+	builtin_marks = { "'", "<", ">", "." },
+})
 
 -- treesitter
 require("nvim-treesitter").setup({
@@ -294,9 +254,16 @@ local base_rg = {
 
 require("telescope").setup({
 	defaults = {
+		preview = { treesitter = true },
+		color_devicons = true,
 		sorting_strategy = "ascending",
 		layout_strategy = "horizontal",
-		layout_config = { horizontal = { preview_width = 0.60 } },
+		layout_config = {
+			horizontal = { preview_width = 0.60 },
+			height = 100,
+			width = 400,
+			prompt_position = "top",
+		},
 		file_ignore_patterns = {
 			"node_modules",
 			".git/",
@@ -309,6 +276,7 @@ require("telescope").setup({
 			"yarn.lock",
 		},
 		vimgrep_arguments = vim.iter({ base_rg, ig }):flatten():totable(),
+		path_displays = { "smart" },
 	},
 
 	pickers = {
@@ -353,9 +321,30 @@ end, "Man Pages")
 tmap("<leader>fk", function()
 	require("telescope.builtin").keymaps()
 end, "Keymaps")
-tmap("<leader>ft", function()
+tmap("<leader>;", function()
 	require("telescope.builtin").builtin()
 end, "Telescope")
+
+-- oil.nvim
+require("oil").setup({
+	default_file_explorer = false,
+	delete_to_trash = true,
+	lsp_file_methods = {
+		enabled = true,
+		timeout_ms = 1000,
+		autosave_changes = true,
+	},
+	columns = {
+		"icon",
+	},
+	view_options = { show_hidden = true, natural_order = true },
+	float = {
+		max_width = 0.3,
+		max_height = 0.8,
+		border = "rounded",
+	},
+})
+vim.keymap.set("n", "-", "<cmd>Oil --float<cr>", { desc = "Open Oil Float" })
 
 -- git
 tmap("<leader>gb", function()
@@ -418,30 +407,6 @@ vim.keymap.set("n", "<leader>fc", function()
 	require("conform").format({ async = true, timeout_ms = 500 })
 end, { desc = "Format Code" })
 
--- oil.nvim
-require("oil").setup({
-	default_file_explorer = false, -- you want netrw too
-	delete_to_trash = true,
-	columns = { "icon" },
-	lsp_file_methods = {
-		enabled = true,
-		autosave_changes = true,
-	},
-	view_options = { show_hidden = true, natural_order = true },
-	win_options = { wrap = true },
-	float = {
-		padding = 2,
-		max_width = 35,
-		max_height = 0.8,
-		border = "rounded",
-		override = function(conf)
-			conf.col = vim.o.columns - conf.width - 2
-			return conf
-		end,
-	},
-})
-vim.keymap.set("n", "-", "<cmd>Oil --float<cr>", { desc = "Open Oil Float" })
-
 -- undotree
 vim.keymap.set("n", "<leader>u", "<cmd>UndotreeToggle<cr>", { desc = "Undo Tree" })
 
@@ -476,7 +441,6 @@ end)
 -- mini.diff setup (visuals & hunk actions)
 local MiniDiff = require("mini.diff")
 MiniDiff.setup({
-	-- use signs in the gutter (minimalist approach)
 	view = {
 		style = "sign",
 		signs = { add = "▎", change = "▎", delete = "" },
