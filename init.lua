@@ -7,64 +7,27 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.number = true
 vim.opt.relativenumber = true
-vim.opt.signcolumn = "yes:2"
-vim.opt.cursorline = true
+vim.opt.signcolumn = "yes:1"
 vim.opt.wrap = false
 vim.opt.termguicolors = true
 vim.opt.laststatus = 3
-vim.opt.tabstop = 2
-vim.opt.expandtab = true
-vim.opt.shiftwidth = 2
-vim.g.netrw_liststyle = 3
-vim.g.netrw_banner = 0
 vim.opt.splitbelow = true
 vim.opt.splitright = true
 vim.opt.completeopt = { "menuone", "popup", "noinsert" }
-
----------------- keymaps
-
-local function map(mode, lhs, rhs, desc)
-	vim.keymap.set(mode, lhs, rhs, { silent = true, desc = desc })
-end
-
-map("v", "J", ":m '>+1<CR>gv=gv", "Move selectin down")
-map("v", "K", ":m '<-2<CR>gv=gv", "Move selection up")
-map("v", "<", "<gv", "Indent left (keep selection)")
-map("v", ">", ">gv", "Indent right (keep selection)")
-map("n", "<M-j>", "<cmd>resize +2<CR>")
-map("n", "<M-k>", "<cmd>resize -2<CR>")
-map("n", "<M-h>", "<cmd>vertical resize +5<CR>")
-map("n", "<M-l>", "<cmd>vertical resize -5<CR>")
-map("n", "G", "Gzz", "Go to end and center")
-map("n", "<C-d>", "<C-d>zz", "Scroll down and center")
-map("n", "<C-u>", "<C-u>zz", "Scroll up and center")
-map("n", "n", "nzzzv", "Next search result (centered)")
-map("n", "N", "Nzzzv", "Prev search result (centered)")
-map({ "n", "v" }, "<leader>y", [["+y]], "Copy to system clipboard")
-map({ "n", "v" }, "<leader>p", [["+p]], "Paste from system clipboard")
-map({ "v", "x" }, "p", '"_dP', "Paste without overwriting register")
-map("t", "<Esc>", "<C-\\><C-n>", "Exit terminal mode")
-map("n", "<Esc>", "<cmd>noh<CR><Esc>", "Remove Highlight")
-map("n", "<leader>e", "<cmd>25Lexplore<cr>", "Toggle Netrw")
-map("n", "<leader>w", vim.cmd.write, "Save file")
-map("n", "<leader>q", vim.cmd.quit, "Quit Neovim")
-map("n", "<leader>r", vim.cmd.restart, "Restart Neovim")
-map("n", "<C-q>", ":copen<CR>")
-map("n", "<leader>dv", function()
-	local current = vim.diagnostic.config().virtual_text
-	vim.diagnostic.config({ virtual_text = not current })
-end, "Toggle diagnostic virtual text")
-map("n", "<leader>dt", function()
-	vim.diagnostic.enable(not vim.diagnostic.is_enabled())
-end, "Toggle diagnostics")
-map({ "n", "t" }, "<Leader>t", "<Cmd>term<CR>i")
-map({ "n", "t" }, "<Leader>x", "<Cmd>tabclose<CR>")
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.softtabstop = 4
+vim.opt.expandtab = true
+vim.opt.filetype.plugin = true
+vim.opt.filetype.indent = true
+vim.g.netrw_liststyle = 3
+vim.g.netrw_banner = 0
+vim.g.netrw_preview = 1
+vim.g.netrw_alto = 0
 
 -------------------- autocmds
-
 local aug = vim.api.nvim_create_augroup("UserConfig", { clear = true })
 
--- highlight on yank
 vim.api.nvim_create_autocmd("TextYankPost", {
 	group = aug,
 	callback = function()
@@ -95,7 +58,6 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 	end,
 })
 
--- auto-reload external changes
 vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "TermLeave" }, {
 	group = aug,
 	callback = function()
@@ -105,7 +67,6 @@ vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "TermLeave" }, {
 	end,
 })
 
--- quit using q
 vim.api.nvim_create_autocmd("FileType", {
 	group = aug,
 	desc = "Enable 'q' to close temporary/utility windows",
@@ -116,7 +77,6 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
--- format on save
 vim.api.nvim_create_autocmd("BufWritePre", {
 	group = aug,
 	callback = function(args)
@@ -124,15 +84,90 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 	end,
 })
 
+local format_sync_grp = vim.api.nvim_create_augroup("GoFormat", {})
+vim.api.nvim_create_autocmd("BufWritePre", {
+	pattern = "*.go",
+	callback = function()
+		require("go.format").goimports()
+	end,
+	group = format_sync_grp,
+})
+
+---------------- keymaps
+local function map(mode, lhs, rhs, desc)
+	vim.keymap.set(mode, lhs, rhs, { silent = true, desc = desc })
+end
+
+map("v", "J", ":m '>+1<CR>gv=gv", "Move selectin down")
+map("v", "K", ":m '<-2<CR>gv=gv", "Move selection up")
+map("v", "<", "<gv", "Indent left (keep selection)")
+map("v", ">", ">gv", "Indent right (keep selection)")
+map("n", "<M-j>", "<cmd>resize +2<CR>")
+map("n", "<M-k>", "<cmd>resize -2<CR>")
+map("n", "<M-h>", "<cmd>vertical resize +5<CR>")
+map("n", "<M-l>", "<cmd>vertical resize -5<CR>")
+map("n", "G", "Gzz", "Go to end and center")
+map("n", "<C-d>", "<C-d>zz", "Scroll down and center")
+map("n", "<C-u>", "<C-u>zz", "Scroll up and center")
+map("n", "n", "nzzzv", "Next search result (centered)")
+map("n", "N", "Nzzzv", "Prev search result (centered)")
+map({ "n", "v" }, "<leader>y", [["+y]], "Copy to system clipboard")
+map({ "n", "v" }, "<leader>p", [["+p]], "Paste from system clipboard")
+map({ "v", "x" }, "p", '"_dP', "Paste without overwriting register")
+map("t", "<Esc>", "<C-\\><C-n>", "Exit terminal mode")
+map("t", "<C-w>", "<C-\\><C-n>", "Exit terminal mode")
+map("n", "<Esc>", "<cmd>noh<CR><Esc>", "Remove Highlight")
+map("n", "<leader>e", "<cmd>25Lexplore<cr>", "Toggle Netrw")
+map("n", "<leader>w", vim.cmd.write, "Save file")
+map("n", "<leader>q", vim.cmd.quit, "Quit Neovim")
+map("n", "<leader>r", vim.cmd.restart, "Restart Neovim")
+map("n", "<C-q>", vim.cmd.copen, "Open QuickFix list")
+map("n", "<leader>dv", function()
+	vim.diagnostic.config({ virtual_text = not vim.diagnostic.config().virtual_text })
+end, "Toggle diagnostic virtual text")
+map("n", "<leader>dt", function()
+	vim.diagnostic.enable(0, not vim.diagnostic.is_enabled(0))
+end, "Toggle diagnostics")
+map("n", "<leader>dq", function()
+	vim.diagnostic.setqflist()
+end, "Toggle diagnostics")
+do
+	local term_buf = nil
+
+	function _G.toggle_terminal()
+		if term_buf and vim.api.nvim_buf_is_valid(term_buf) then
+			local existing_win = nil
+			for _, win in ipairs(vim.api.nvim_list_wins()) do
+				if vim.api.nvim_win_get_buf(win) == term_buf then
+					existing_win = win
+					break
+				end
+			end
+
+			if existing_win then
+				vim.api.nvim_win_close(existing_win, true)
+			else
+				vim.cmd.split()
+				vim.api.nvim_win_set_buf(0, term_buf)
+				vim.cmd.startinsert()
+			end
+		else
+			vim.cmd.split()
+			vim.cmd.term()
+			term_buf = vim.api.nvim_get_current_buf()
+			vim.keymap.set("t", "<C-\\>", "<cmd>lua _G.toggle_terminal()<CR>", { buffer = term_buf })
+			vim.cmd.startinsert()
+		end
+	end
+
+	map("n", "<C-\\>", "<cmd>lua _G.toggle_terminal()<CR>", "Toggle Terminal")
+end
+
 ---------------------- plugins
-
--- runtime path adjustment
--- vim.opt.rtp:prepend(vim.fn.stdpath("config") .. "/lua")
-
 vim.pack.add({
 	{ src = "https://github.com/vague-theme/vague.nvim", name = "vague" },
+	{ src = "https://github.com/rose-pine/neovim", name = "rose-pine" },
 	{ src = "https://github.com/nvim-mini/mini.nvim", name = "mini" },
-	{ src = "https://github.com/chentoast/marks.nvim", name = "marks" },
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter", name = "nvim-treesitter" },
 	{ src = "https://github.com/neovim/nvim-lspconfig", name = "lspconfig" },
 	{ src = "https://github.com/mason-org/mason.nvim", name = "mason" },
@@ -145,38 +180,34 @@ vim.pack.add({
 	{ src = "https://github.com/nvim-lua/plenary.nvim", name = "plenary" },
 	{ src = "https://github.com/mbbill/undotree", name = "undotree" },
 	{ src = "https://github.com/stevearc/oil.nvim", name = "oil" },
-	{ src = "https://github.com/tpope/vim-fugitive", name = "vim-fugitive" },
-	{
-		src = "https://github.com/ThePrimeagen/harpoon",
-		name = "harpoon",
-		branch = "harpoon3",
-	},
 	{ src = "https://github.com/sudo-tee/opencode.nvim", name = "opencode.nvim" },
 	{ src = "https://github.com/MeanderingProgrammer/render-markdown.nvim", name = "render-markdown" },
+	{ src = "https://github.com/ray-x/go.nvim", name = "go" },
+
+	{ src = "https://github.com/mfussenegger/nvim-lint", name = "nvim-lint" },
 })
 
 vim.cmd.packloadall() -- ensure all plugins are loaded
 
+require("rose-pine").setup()
 require("vague").setup({
-	transparent = false,
+	transparent = true,
 })
-
 vim.cmd("colorscheme vague")
+
 -- vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 -- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 -- vim.api.nvim_set_hl(0, "StatusLine", { bg = "none" })
+vim.api.nvim_set_hl(0, "TabLineSel", { bg = "#e0e0e0", fg = "#16161d", bold = true })
+for i = 1, 8 do
+	map({ "n", "t" }, "<Leader>" .. i, "<Cmd>tabnext " .. i .. "<CR>")
+end
 
 require("mini.icons").setup()
 require("mini.icons").mock_nvim_web_devicons() --mock devicons (for Telescope)
 require("mini.surround").setup()
 require("mini.pairs").setup()
-
--- marks
-require("marks").setup({
-	default_mappings = true,
-	signs = true,
-	builtin_marks = { "'", "<", ">", "." },
-})
+require("mini.statusline").setup()
 
 -- treesitter
 require("nvim-treesitter").setup({
@@ -196,7 +227,7 @@ require("nvim-treesitter").setup({
 		"vim",
 		"yaml",
 	},
-	sync_install = true,
+	auto_install = true,
 	highlight = { enable = true },
 	indent = { enable = true },
 })
@@ -313,9 +344,9 @@ end, "References")
 map("n", "<leader>fm", function()
 	require("telescope.builtin").man_pages()
 end, "Man Pages")
-map("n", "<leader>fk", function()
-	require("telescope.builtin").keymaps()
-end, "Keymaps")
+map("n", "<leader>m", function()
+	require("telescope.builtin").marks()
+end, "Marks")
 map("n", "<leader>;", function()
 	require("telescope.builtin").builtin()
 end, "Telescope")
@@ -341,34 +372,6 @@ require("oil").setup({
 })
 vim.keymap.set("n", "-", "<cmd>Oil --float<cr>", { desc = "Open Oil Float" })
 
--- git
-map("n", "<leader>gb", function()
-	require("telescope.builtin").git_bcommits(require("telescope.themes").get_ivy())
-end, "Git BCommits")
-map("n", "<leader>gf", function()
-	require("telescope.builtin").git_files()
-end, "Git Files")
-map("n", "<leader>gB", function()
-	require("telescope.builtin").git_branches({
-		layout_strategy = "horizontal",
-		layout_config = { width = 0.99, height = 0.99, preview_width = 0.70 },
-	})
-end, "Git Branches")
-map("n", "<leader>gC", function()
-	require("telescope.builtin").git_commits(require("telescope.themes").get_ivy())
-end, "Git Commits")
-map("n", "<leader>gs", function()
-	require("telescope.builtin").git_status({
-		layout_strategy = "horizontal",
-		layout_config = { width = 0.99, height = 0.99, preview_width = 0.70 },
-	})
-end, "Git Status")
-
--- diagnostics
-map("n", "<leader>dd", function()
-	require("telescope.builtin").diagnostics({ layout_strategy = "vertical", sorting_strategy = "ascending" })
-end, "Diagnostics")
-
 -- conform (formatting + linting) - uses Mason for installation
 require("conform").setup({
 	formatters_by_ft = {
@@ -382,7 +385,7 @@ require("conform").setup({
 		html = { "prettier" },
 		css = { "prettier" },
 		markdown = { "prettier" },
-		python = { "black", "isort" },
+		python = { "black" },
 		rust = { "rustfmt" },
 		bash = { "shfmt" },
 		sh = { "shfmt" },
@@ -408,30 +411,43 @@ vim.keymap.set("n", "<leader>u", "<cmd>UndotreeToggle<cr>", { desc = "Undo Tree"
 -- mason (package manager for lsp/formatters/linters)
 require("mason").setup({ ui = { border = "rounded" }, log_level = vim.log.levels.INFO })
 
--- harpoon
-local harpoon = require("harpoon")
-harpoon:setup()
+-- git
+-- mini.git setup
+require("mini.git").setup()
+map("n", "<leader>gs", "<cmd>Git status<CR>", "Git Status")
+map("n", "<leader>gc", "<cmd>Git commit -v<CR>", "Git Commit")
+map("n", "<leader>gl", "<cmd>Git log --oneline -20<CR>", "Git Log")
+map("n", "<leader>gd", "<cmd>Git diff<CR>", "Git Diff (Full)")
+map("n", "<leader>gp", "<cmd>Git push<CR>", "Git Push")
+map("n", "<leader>gP", "<cmd>Git pull<CR>", "Git Pull")
 
--- basic keymaps for harpoon
-vim.keymap.set("n", "<leader>ha", function()
-	harpoon:list():add()
-end, { desc = "Harpoon Add" })
-vim.keymap.set("n", "<C-e>", function()
-	harpoon.ui:toggle_quick_menu(harpoon:list())
-end, { desc = "Harpoon Menu" })
+-- telescope git
+map("n", "<leader>gb", function()
+	require("telescope.builtin").git_bcommits(require("telescope.themes").get_ivy())
+end, "Git BCommits")
+map("n", "<leader>gf", function()
+	require("telescope.builtin").git_files()
+end, "Git Files")
+map("n", "<leader>gB", function()
+	require("telescope.builtin").git_branches({
+		layout_strategy = "horizontal",
+		layout_config = { width = 0.99, height = 0.99, preview_width = 0.70 },
+	})
+end, "Git Branches")
+map("n", "<leader>gC", function()
+	require("telescope.builtin").git_commits(require("telescope.themes").get_ivy())
+end, "Git Commits")
+map("n", "<leader>gS", function()
+	require("telescope.builtin").git_status({
+		layout_strategy = "horizontal",
+		layout_config = { width = 0.99, height = 0.99, preview_width = 0.70 },
+	})
+end, "Git Status")
 
-vim.keymap.set("n", "<C-h>", function()
-	harpoon:list():select(1)
-end)
-vim.keymap.set("n", "<C-j>", function()
-	harpoon:list():select(2)
-end)
-vim.keymap.set("n", "<C-k>", function()
-	harpoon:list():select(3)
-end)
-vim.keymap.set("n", "<C-l>", function()
-	harpoon:list():select(4)
-end)
+-- telescope diagnostics
+map("n", "<leader>dd", function()
+	require("telescope.builtin").diagnostics({ layout_strategy = "vertical", sorting_strategy = "ascending" })
+end, "Diagnostics")
 
 -- mini.diff setup (visuals & hunk actions)
 local MiniDiff = require("mini.diff")
@@ -440,6 +456,7 @@ MiniDiff.setup({
 		style = "sign",
 		signs = { add = "▎", change = "▎", delete = "" },
 	},
+	source = require("mini.diff").gen_source.git(),
 })
 
 -- hunk navigation (]h and [h)
@@ -451,30 +468,17 @@ vim.keymap.set("n", "[h", function()
 end, { desc = "Prev Hunk" })
 
 -- hunk actions (stage and reset)
-vim.keymap.set("n", "<leader>hs", function()
+vim.keymap.set({ "n", "x" }, "<leader>hs", function()
 	MiniDiff.operator("apply")
 end, { desc = "Stage Hunk" })
-vim.keymap.set("n", "<leader>hr", function()
+vim.keymap.set({ "n", "x" }, "<leader>hr", function()
 	MiniDiff.operator("reset")
 end, { desc = "Reset Hunk" })
--- visual mode support (select lines then stage/reset)
-vim.keymap.set("x", "<leader>hs", ':MiniDiff.operator("apply")<CR>', { desc = "Stage Selection" })
-vim.keymap.set("x", "<leader>hr", ':MiniDiff.operator("reset")<CR>', { desc = "Reset Selection" })
 
 -- overlay toggle (see exactly what was deleted/changed inline)
 vim.keymap.set("n", "<leader>hv", MiniDiff.toggle_overlay, { desc = "Toggle Hunk View" })
 
--- fugitive setup
--- fugitive doesn't need a .setup() call, just mappings
-vim.keymap.set("n", "<leader>gs", vim.cmd.Git, { desc = "Git Status" })
-vim.keymap.set("n", "<leader>gb", ":G blame<CR>", { desc = "Git Blame" })
-vim.keymap.set("n", "<leader>gd", ":Gvdiffsplit<CR>", { desc = "Git Diff Split" })
--- push and pull
-vim.keymap.set("n", "<leader>gp", ":Git push<CR>", { desc = "Git Push" })
-vim.keymap.set("n", "<leader>gP", ":Git pull<CR>", { desc = "Git Pull" })
-
 -- opencode.nvim
-
 -- Default configuration with all available options
 require("opencode").setup({
 	preferred_picker = "telescope",
@@ -511,7 +515,6 @@ local ok, blink = pcall(require, "blink.cmp")
 if ok and blink.get_lsp_capabilities then
 	capabilities = vim.tbl_deep_extend("force", capabilities, blink.get_lsp_capabilities())
 end
-capabilities = capabilities
 
 require("mason-lspconfig").setup({
 	ensure_installed = {
@@ -532,6 +535,23 @@ require("mason-lspconfig").setup({
 	handlers = {
 		function(server)
 			vim.lsp.config(server, { capabilities = capabilities })
+		end,
+		["gopls"] = function()
+			vim.lsp.config("gopls", {
+				capabilities = capabilities,
+				settings = {
+					gopls = {
+						hints = {
+							assignVariableTypes = false,
+							compositeLiteralFields = false,
+							constantValues = false,
+							functionTypeParameters = false,
+							parameterNames = false,
+							rangeVariableTypes = false,
+						},
+					},
+				},
+			})
 		end,
 		["lua_ls"] = function()
 			vim.lsp.config("lua_ls", {
@@ -557,10 +577,6 @@ require("mason-lspconfig").setup({
 vim.api.nvim_create_autocmd("LspAttach", {
 	callback = function(args)
 		local buf = args.buf
-		local client = vim.lsp.get_client_by_id(args.data.client_id)
-		if not client then
-			return
-		end
 
 		local function map(lhs, rhs, desc)
 			vim.keymap.set("n", lhs, rhs, { buffer = buf, silent = true, desc = desc })
@@ -572,6 +588,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		map("<C-s>", function()
 			vim.lsp.buf.signature_help({ border = "rounded", max_height = 30, max_width = 100 })
 		end, "Signature Help")
+
+		vim.lsp.inlay_hint.enable(false)
 	end,
 })
 
@@ -582,3 +600,21 @@ vim.diagnostic.config({
 	update_in_insert = false,
 	float = { border = "rounded", max_width = 80 },
 })
+
+require("go").setup()
+
+require("lint").linters_by_ft = {
+	python = { "ruff" },
+	javascript = { "eslint" },
+	typescript = { "eslint" },
+	javascriptreact = { "eslint" },
+	typescriptreact = { "eslint" },
+	rust = { "clippy" },
+}
+
+vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+	callback = function()
+		require("lint").try_lint()
+	end,
+})
+require("scratchpad")
