@@ -1,18 +1,10 @@
 {
   "$schema": "https://raw.githubusercontent.com/LuaLS/lua-language-server/main/doc/ja-jp/resources/luals_client_schema.json",
   "runtime.version": "LuaJIT",
-  "runtime.path": [
-    "?.lua",
-    "?/init.lua",
-    "vim/?.lua"
-  ],
-  "workspace.library": [
-    "$VIMRUNTIME"
-  ],
+  "runtime.path": ["?.lua", "?/init.lua", "vim/?.lua"],
+  "workspace.library": ["$VIMRUNTIME"],
   "diagnostics.enable": true,
-  "diagnostics.globals": [
-    "vim"
-  ],
+  "diagnostics.globals": ["vim"],
   "diagnostics.ignoredFiles": "Disable",
   "typeCheckingMode": "Recommended",
   "hint.enable": true
