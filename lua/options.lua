@@ -57,6 +57,17 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 	end,
 })
 
+vim.api.nvim_create_autocmd("BufEnter", {
+	group = aug,
+	desc = "Set CWD to project root",
+	callback = function()
+		local root = vim.fs.root(0, { ".git", "Makefile", "package.json", "Cargo.toml", "go.mod" })
+		if root then
+			vim.fn.chdir(root)
+		end
+	end,
+})
+
 vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "TermLeave" }, {
 	group = aug,
 	desc = "Reload file if changed externally",
