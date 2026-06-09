@@ -2,6 +2,7 @@ vim.pack.add({
 	{ src = "https://github.com/vague-theme/vague.nvim" },
 	{ src = "https://github.com/nvim-lua/plenary.nvim" },
 	{ src = "https://github.com/Saghen/blink.cmp" },
+	{ src = "https://github.com/saghen/blink.compat" },
 	{ src = "https://github.com/rafamadriz/friendly-snippets" },
 	{ src = "https://github.com/ray-x/go.nvim" },
 	{ src = "https://github.com/wakatime/vim-wakatime" },
@@ -13,10 +14,10 @@ vim.pack.add({
 	{ src = "https://github.com/mason-org/mason.nvim" },
 	{ src = "https://github.com/neovim/nvim-lspconfig" },
 	{ src = "https://github.com/nvim-mini/mini.nvim" },
-	{ src = "https://github.com/tpope/vim-fugitive" },
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter" },
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter-context" },
 	{ src = "https://github.com/MeanderingProgrammer/render-markdown.nvim" },
+	{ src = "https://github.com/ThePrimeagen/99" },
 })
 
 require("vague").setup({ transparent = true })
@@ -48,9 +49,6 @@ end, { desc = "Reset Hunk" })
 vim.keymap.set("n", "<leader>hv", function()
 	require("mini.diff").toggle_overlay()
 end, { desc = "Toggle Hunk View" })
-
-vim.keymap.set("n", "<leader>gg", "<cmd>tabnew | Git | only<cr>", { desc = "Fugitive Full Page New Tab" })
-vim.keymap.set("n", "<leader>gd", "<cmd>Gvdiffsplit<CR>", { desc = "Git diff split" })
 
 require("blink.cmp").setup({
 	snippets = { preset = "default" },
@@ -93,6 +91,8 @@ require("blink.cmp").setup({
 		},
 	},
 })
+
+require("blink.compat")
 
 require("go").setup()
 
@@ -180,5 +180,6 @@ vim.keymap.set("n", "<leader>f", "<cmd>FzfLua files<cr>", { desc = "Find files" 
 vim.keymap.set("n", "<leader>s", "<cmd>FzfLua live_grep<cr>", { desc = "Find live grep" })
 vim.keymap.set("n", "<leader>d", "<cmd>FzfLua diagnostics_workspace<cr>", { desc = "Diagnostics Workspace" })
 vim.keymap.set("n", "<leader>/", "<cmd>FzfLua grep_curbuf<cr>", { desc = "Search in Current Buff" })
+vim.keymap.set("n", "<leader>m", "<cmd>FzfLua marks<cr>", { desc = "Search Marks" })
 
 require("render-markdown").setup({ anti_conceal = { enabled = false }, file_types = { "markdown" } })

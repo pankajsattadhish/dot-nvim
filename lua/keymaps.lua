@@ -34,3 +34,31 @@ end)
 for i = 1, 8 do
 	vim.keymap.set("n", "<leader>" .. i, "<Cmd>tabnext " .. i .. "<CR>")
 end
+
+vim.keymap.set({ "n", "v" }, "<leader>y", function()
+	local bufname = vim.api.nvim_buf_get_name(0)
+	if bufname == "" then
+		vim.notify("No file saved yet", vim.log.levels.WARN)
+		return
+	end
+
+	local path = vim.fn.fnamemodify(bufname, ":p")
+	local mode = vim.api.nvim_get_mode().mode
+
+	if mode:match("^[vV\22]") then
+		local start_line = vim.fn.line("v")
+		local end_line = vim.fn.line(".")
+		if start_line > end_line then
+			start_line, end_line = end_line, start_line
+		end
+		if start_line == end_line then
+			path = path .. ":" .. start_line
+		else
+			path = path .. ":" .. start_line .. "-" .. end_line
+		end
+		vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
+	end
+
+	vim.fn.setreg("+", path)
+	vim.notify("Copied to clipboard: " .. path, vim.log.levels.INFO)
+end, { desc = "Yank file path with line range for opencode" })
