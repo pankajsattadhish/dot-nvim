@@ -19,8 +19,6 @@ vim.keymap.set("n", "<leader>w", "<cmd>write<cr>")
 vim.keymap.set("n", "<leader>q", "<cmd>quit<cr>")
 vim.keymap.set("n", "<leader>r", "<cmd>restart<cr>")
 
-vim.keymap.set("n", "<leader>t", "<cmd>tabnew | FzfLua files<cr>i")
-
 vim.keymap.set("n", "<leader>u", function()
 	vim.cmd.packadd("nvim.undotree")
 	require("undotree").open()
@@ -56,4 +54,4 @@ vim.keymap.set({ "n", "v" }, "<leader>y", function()
 
 	vim.fn.setreg("+", path)
 	vim.notify("Copied to clipboard: " .. path, vim.log.levels.INFO)
-end, { desc = "Yank file path with line range for opencode" })
+end, { desc = "Yank file path with line range" })
