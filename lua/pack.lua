@@ -15,7 +15,6 @@ vim.pack.add({
 	{ src = "https://github.com/neovim/nvim-lspconfig" },
 	{ src = "https://github.com/nvim-mini/mini.nvim" },
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter" },
-	{ src = "https://github.com/nvim-treesitter/nvim-treesitter-context" },
 	{ src = "https://github.com/MeanderingProgrammer/render-markdown.nvim" },
 	{ src = "https://github.com/ThePrimeagen/99" },
 })
@@ -128,22 +127,22 @@ vim.keymap.set("n", "-", function()
 end, { desc = "Open Oil Float" })
 
 require("conform").setup({
-	format_on_save = {
-		timeout_ms = 8000,
-		lsp_format = "fallback",
-	},
+	-- format_on_save = {
+	-- 	timeout_ms = 8000,
+	-- 	lsp_format = "fallback",
+	-- },
 	formatters_by_ft = {
 		lua = { "stylua" },
-		javascript = { "prettierd" },
-		javascriptreact = { "prettierd" },
-		typescript = { "prettierd" },
-		typescriptreact = { "prettierd" },
-		graphql = { "prettierd" },
+		javascript = { "prettier" },
+		javascriptreact = { "prettier" },
+		typescript = { "prettier" },
+		typescriptreact = { "prettier" },
+		graphql = { "prettier" },
 		go = { "goimports", "gofmt" },
-		json = { "prettierd" },
-		html = { "prettierd" },
-		css = { "prettierd" },
-		markdown = { "prettierd" },
+		json = { "prettier" },
+		html = { "prettier" },
+		css = { "prettier" },
+		markdown = { "prettier" },
 		yaml = { "prettierd", "yamlfmt" },
 		python = { "black" },
 		rust = { "rustfmt" },
@@ -162,7 +161,7 @@ require("conform").setup({
 })
 
 vim.keymap.set("n", "<leader>lf", function()
-	require("conform").format({ async = true, timeout_ms = 8000 })
+	require("conform").format({ async = true, timeout_ms = 30000 })
 end, { desc = "Format Code" })
 
 require("fzf-lua").setup({
@@ -177,6 +176,7 @@ require("fzf-lua").setup({
 vim.keymap.set("n", "<leader>;", "<cmd>FzfLua builtin<cr>", { desc = "FzfLua Pickers" })
 vim.keymap.set("n", "<leader><BS>", "<cmd>FzfLua resume<cr>", { desc = "Last Picker" })
 vim.keymap.set("n", "<leader>f", "<cmd>FzfLua files<cr>", { desc = "Find files" })
+vim.keymap.set("n", "<C-p>", "<cmd>FzfLua files<cr>", { desc = "Find files" })
 vim.keymap.set("n", "<leader>s", "<cmd>FzfLua live_grep<cr>", { desc = "Find live grep" })
 vim.keymap.set("n", "<leader>d", "<cmd>FzfLua diagnostics_workspace<cr>", { desc = "Diagnostics Workspace" })
 vim.keymap.set("n", "<leader>/", "<cmd>FzfLua grep_curbuf<cr>", { desc = "Search in Current Buff" })
