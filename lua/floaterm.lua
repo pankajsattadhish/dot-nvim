@@ -9,7 +9,8 @@ local function create_terminal()
 	local buf = vim.api.nvim_create_buf(false, true)
 	vim.api.nvim_set_option_value("buflisted", false, { buf = buf })
 	vim.api.nvim_buf_call(buf, function()
-		vim.fn.termopen({ vim.o.shell })
+		---@diagnostic disable-next-line: deprecated
+		vim.fn.termopen(vim.o.shell)
 	end)
 	return buf
 end
