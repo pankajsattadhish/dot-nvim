@@ -1,29 +1,3 @@
-vim.g.mapleader = " "
-vim.opt.mouse = "a"
-vim.opt.number = true
-vim.opt.swapfile = false
-vim.opt.backup = false
-vim.opt.undodir = vim.fn.stdpath("data") .. "/undodir"
-vim.opt.undofile = true
-vim.opt.ignorecase = true
-vim.opt.smartcase = true
-vim.opt.smartindent = true
-vim.opt.clipboard:append("unnamedplus")
-vim.opt.isfname:append("@-@")
-vim.opt.confirm = true
-vim.opt.signcolumn = "yes:2"
-vim.opt.laststatus = 3
-vim.opt.splitbelow = true
-vim.opt.splitright = true
-vim.opt.completeopt = { "menu", "menuone", "fuzzy", "noinsert", "popup", "nosort", "noselect" }
-vim.opt.tabstop = 4
-vim.opt.softtabstop = 4
-vim.opt.shiftwidth = 4
-vim.opt.expandtab = true
-vim.opt.winborder = "rounded"
-vim.opt.foldmethod = "manual"
-vim.opt.viewoptions = { "cursor", "folds" }
-
 local aug = vim.api.nvim_create_augroup("UserConfig", { clear = true })
 
 vim.api.nvim_create_autocmd("TextYankPost", {
@@ -39,6 +13,31 @@ vim.api.nvim_create_autocmd("FileType", {
 	desc = "No comment line on new line",
 	callback = function(ev)
 		vim.bo[ev.buf].formatoptions = vim.bo[ev.buf].formatoptions:gsub("[cro]", "")
+	end,
+})
+
+local is_file_buf = function(bufnr)
+	return vim.bo[bufnr].buftype == "" and vim.fn.bufname(bufnr) ~= ""
+end
+
+vim.api.nvim_create_autocmd("BufWinEnter", {
+	group = aug,
+	desc = "Restore persisted folds and cursor",
+	callback = function(ev)
+		if is_file_buf(ev.buf) then
+			pcall(vim.cmd.loadview)
+		end
+	end,
+})
+
+vim.api.nvim_create_autocmd({ "BufWinLeave", "VimLeavePre" }, {
+	group = aug,
+	desc = "Persist folds and cursor",
+	callback = function(ev)
+		local bufnr = ev.event == "VimLeavePre" and vim.api.nvim_get_current_buf() or ev.buf
+		if is_file_buf(bufnr) then
+			pcall(vim.cmd.mkview)
+		end
 	end,
 })
 
@@ -81,9 +80,10 @@ vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "TermLeave" }, {
 vim.api.nvim_create_autocmd("FileType", {
 	group = aug,
 	desc = "Enable 'q' to close temporary/utility windows",
-	pattern = { "help", "qf", "man", "lspinfo", "checkhealth", "oil", "query" },
+	pattern = { "help", "qf", "man", "lspinfo", "checkhealth", "query" },
 	callback = function(ev)
 		vim.bo[ev.buf].buflisted = false
 		vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = ev.buf, silent = true, desc = "Close window" })
 	end,
 })
+

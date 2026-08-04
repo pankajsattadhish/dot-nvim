@@ -1,9 +1,2 @@
-require("vim._core.ui2").enable({})
-
-require("options")
-require("keymaps")
-require("pack")
-require("treesitter")
-require("lsp")
-require("floaterm")
-require("99conf")
+require("config")
+require("plugins")

@@ -17,7 +17,7 @@ end
 
 local function open_window(buf)
 	local width = math.floor(vim.o.columns * 0.8)
-	local height = math.floor(vim.o.lines * 0.6)
+	local height = math.floor(vim.o.lines * 0.8)
 	local col = math.floor((vim.o.columns - width) / 2)
 	local row = math.floor((vim.o.lines - height) / 2)
 
@@ -30,6 +30,7 @@ local function open_window(buf)
 		style = "minimal",
 		border = "rounded",
 	})
+	-- vim.api.nvim_set_option_value("winblend", 50, { win = win })
 	vim.cmd("startinsert")
 	return win
 end
@@ -49,6 +50,6 @@ function M.toggle()
 	end
 end
 
-vim.keymap.set({ "n", "t" }, "<C-\\>", M.toggle, { desc = "Toggle floating terminal" })
+vim.keymap.set({ "n", "t" }, "<C-Space>", M.toggle, { desc = "Toggle floating terminal" })
 
 return M
