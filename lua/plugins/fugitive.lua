@@ -5,7 +5,7 @@ vim.pack.add({ "https://github.com/tpope/vim-fugitive" })
 --   :Git          status window
 --   :Gvdiffsplit main   diff against main
 --   :G blame       toggle blame
---   :Glog         browse commit history
+--   :G log         browse commit history
 --   :Gread        discard changes to current file
 --   :Git push     push
 --   :Git fetch    fetch
