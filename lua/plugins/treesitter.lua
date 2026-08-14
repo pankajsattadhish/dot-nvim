@@ -12,6 +12,7 @@ require("nvim-treesitter").setup({
 		"lua",
 		"go",
 		"markdown",
+		"org",
 		"python",
 		"rust",
 		"typescript",
