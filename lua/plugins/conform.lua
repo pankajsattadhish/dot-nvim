@@ -26,6 +26,7 @@ require("conform").setup({
 		cpp = { "clang_format" },
 		c = { "clang_format" },
 		sql = { "sql_formatter" },
+		elm = { "elm-format" },
 	},
 	formatters = {
 		sql_formatter = {
