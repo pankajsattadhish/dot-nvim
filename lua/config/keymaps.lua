@@ -24,7 +24,7 @@ vim.keymap.set("n", "<leader>fP", function()
 end, { desc = "Open Neovim config in new tab" })
 
 vim.keymap.set("n", "<leader>bn", "<cmd>bnext<cr>")
-vim.keymap.set("n", "<leader>bn", "<cmd>bprevious<cr>")
+vim.keymap.set("n", "<leader>bp", "<cmd>bprevious<cr>")
 vim.keymap.set("n", "<leader>bk", "<cmd>bdelete<cr>")
 
 vim.keymap.set("n", "<leader>su", function()
