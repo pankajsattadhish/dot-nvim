@@ -16,8 +16,8 @@ fyler.setup({
 	kind_presets = {
 		floating = {
 			border = "rounded",
-			height = "80%",
-			width = "60%",
+			height = "90%",
+			width = "30%",
 			col = "center",
 			row = "center",
 			mappings = { n = { ["<CR>"] = { action = "select", args = { close = true } } } },
@@ -48,16 +48,16 @@ fyler.setup({
 	},
 	ui = {
 		hidden_items = {
-			switches = {},
+			switches = { "dotfiles" },
 			patterns = {},
-			always_visible = { "dotfiles" },
+			always_visible = {},
 			always_hidden = {},
 		},
 		indent_guides = true,
 	},
 })
 
-vim.keymap.set("n", "<leader>e", function()
+vim.keymap.set("n", "<leader>op", function()
 	require("fyler").toggle({ kind = "split_left_most" })
 end, { desc = "Fyler tree sidebar" })
 vim.keymap.set("n", "-", function()
