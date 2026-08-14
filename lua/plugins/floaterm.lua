@@ -50,6 +50,6 @@ function M.toggle()
 	end
 end
 
-vim.keymap.set({ "n", "t" }, "<C-Space>", M.toggle, { desc = "Toggle floating terminal" })
+vim.keymap.set({ "n", "t" }, "<C-\\>", M.toggle, { desc = "Toggle floating terminal" })
 
 return M
